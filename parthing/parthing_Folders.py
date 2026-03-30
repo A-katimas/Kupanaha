@@ -54,7 +54,7 @@ def parth_file_path(file_path: str) -> dict | None:
                 if not line or line.startswith("#"):
                     continue
 
-                if "=" not in line:
+                if line.count("=") != 1:
                     raise ValueError(color(f"invalif line: {line}", 255, 150, 150))
 
                 key, value = line.split("=", 1)
@@ -85,6 +85,9 @@ def parth(file_path: str) -> BaseConfig | None:
             Perfect=config_dict.get("PERFECT", "False").lower() == "true",
         )
     except ValidationError as e:
+        print(color("Error : ", 250, 70, 70) + color(f"{e}", 200, 100, 100))
+        return None
+    except ValueError as e:
         print(color("Error : ", 250, 70, 70) + color(f"{e}", 200, 100, 100))
         return None
 
