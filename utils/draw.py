@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 from utils.wall import *
 from utils import color
-from .cursor import cursor
+from .cursor import cursor_more_line
 
 if TYPE_CHECKING:
     from parthing import BaseConfig
@@ -25,5 +25,5 @@ def info(config: "BaseConfig", pos: tuple) -> None:
 
 
 def a_maze(maze: list[Wall]):
-     for i in maze:
+    for i in maze:
         print(i.wall(), end="")

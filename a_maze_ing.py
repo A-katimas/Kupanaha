@@ -1,6 +1,7 @@
 from parthing import parth
-from utils import color, info, a_maze
+from utils import color, info, a_maze, clear
 from maze.maker import make_a_maze
+from utils.player import Player
 import sys
 
 folders_exist = True
@@ -26,10 +27,12 @@ def main():
     config = parth(sys.argv[1])
     if config == None:
         return 0
-    info(config,(2,2))
+    clear()
+    player = Player((20, 50))
+    info(config, (2, 2))
 
     a_maze(make_a_maze())
-
+    player.move()
 
 if __name__ == "__main__":
     if folders_exist:
