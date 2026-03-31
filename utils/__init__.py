@@ -1,5 +1,18 @@
-from .color import color
-from .draw import info, a_maze
-from .cursor import clear, cursor, cursor_more_line
+from .color import color, bg_color
+from .draw import info, a_maze, Presentation
+from .cursor import clear, cursor, cursor_more_line, move_cursor_to_bottom
+from .player import Player, get_key
 
-__all__ = ["color", "info", "a_maze", "clear", "cursor", "cursor_more_line"]
+__all__ = [
+    "color",
+    "bg_color",
+    "info",
+    "a_maze",
+    "Presentation",
+    "clear",
+    "cursor",
+    "cursor_more_line",
+    "move_cursor_to_bottom",
+    "Player",
+    "get_key",
+]

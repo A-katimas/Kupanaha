@@ -1,3 +1,6 @@
+
+
+
 def color(text: str | int, r: int, g: int, b: int) -> str:
     if isinstance(text, str):
         return f"\033[38;2;{r};{g};{b}m{text}\033[0m"

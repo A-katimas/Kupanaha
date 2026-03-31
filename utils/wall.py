@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from .cursor import cursor_more_line
+from utils import bg_color, color
 
 
 class Wall(ABC):

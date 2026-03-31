@@ -1,10 +1,18 @@
 from parthing import parth
-from utils import color, info, a_maze, clear, cursor, cursor_more_line
+from utils import (
+    color,
+    info,
+    a_maze,
+    clear,
+    cursor,
+    cursor_more_line,
+    move_cursor_to_bottom,
+    Presentation,
+)
 from maze import Maze
 from utils.player import Player
-from utils.cursor import move_cursor_to_bottom
+
 import sys
-import os
 
 folders_exist = True
 try:
@@ -29,16 +37,25 @@ def main():
     config = parth(sys.argv[1])
     if config == None:
         return 0
-    amazeing = Maze((config.Width, config.Height), config.Entry, config.Exit, (10, 10))
+    amazeing = Maze(
+        (config.Width, config.Height), config.Entry, config.Exit, (15, 15), "white"
+    )
     clear()
-    size = os.get_terminal_size()
-    player = Player((11, 30), "🦦")
-    info(config, (2, 2))
 
+    player = Player([amazeing.enter[0], amazeing.enter[1]], "🦦")
+    press = Presentation(config, amazeing, player)
+    #info(config, (2, 2))
+    a_maze(amazeing.print_maze, amazeing.get_theme()[0], amazeing.get_theme()[1])
+    move_cursor_to_bottom()
+
+    while player.move() != "a":
+        press.start()
     # cursor_more_line((1,1),amazeing.maze)
-    a_maze(amazeing.print_maze)
-    player.move()
-    print(size.lines - 10, size.columns - 10)
+    while player.move() != "a":
+        a_maze(amazeing.print_maze, amazeing.get_theme()[0], amazeing.get_theme()[1])
+        press.loop()
+        player.print_self()
+
     move_cursor_to_bottom()
 
 
