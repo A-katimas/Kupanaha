@@ -21,9 +21,9 @@ class S(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "███████",
-                "██   ██",
-                "██   ██",
+                "█▀▀▀▀█",
+                "█    █",
+                "█    █",
             ],
         )
 
@@ -36,9 +36,9 @@ class N(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "██   ██",
-                "██   ██",
-                "███████",
+                "█    █",
+                "█    █",
+                "█▄▄▄▄█",
             ],
         )
 
@@ -51,9 +51,9 @@ class W(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "██████",
-                "    ██",
-                "██████",
+                "▀▀▀▀▀█",
+                "     █",
+                "▄▄▄▄▄█",
             ],
         )
 
@@ -66,9 +66,9 @@ class E(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "██████",
-                "██    ",
-                "██████",
+                "█▀▀▀▀▀",
+                "█     ",
+                "█▄▄▄▄▄",
             ],
         )
 
@@ -81,9 +81,9 @@ class N_W(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "██  ██",
-                "    ██",
-                "██████",
+                "▀    █",
+                "     █",
+                "▄▄▄▄▄█",
             ],
         )
 
@@ -96,9 +96,9 @@ class E_W(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "██████",
+                "▀▀▀▀▀▀",
                 "      ",
-                "██████",
+                "▄▄▄▄▄▄",
             ],
         )
 
@@ -111,9 +111,9 @@ class S_W(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "██████",
-                "    ██",
-                "██  ██",
+                "▀▀▀▀▀█",
+                "     █",
+                "▄    █",
             ],
         )
 
@@ -126,9 +126,9 @@ class S_E(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "██████",
-                "██    ",
-                "██  ██",
+                "█▀▀▀▀▀",
+                "█     ",
+                "█    ▄",
             ],
         )
 
@@ -141,9 +141,9 @@ class S_N(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "██  ██",
-                "██  ██",
-                "██  ██",
+                "█    █",
+                "█    █",
+                "█    █",
             ],
         )
 
@@ -156,9 +156,9 @@ class N_E(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "██  ██",
-                "██    ",
-                "██████",
+                "█    ▀",
+                "█     ",
+                "█▄▄▄▄▄",
             ],
         )
 
@@ -171,9 +171,9 @@ class N_E_W(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "██  ██",
+                "▀    ▀",
                 "      ",
-                "██████",
+                "▄▄▄▄▄▄",
             ],
         )
 
@@ -186,9 +186,9 @@ class N_S_E(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "██  ██",
-                "██    ",
-                "██  ██",
+                "█    ▀",
+                "█     ",
+                "█    ▄",
             ],
         )
 
@@ -201,9 +201,9 @@ class N_S_W(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "██  ██",
-                "    ██",
-                "██  ██",
+                "▀    █",
+                "     █",
+                "▄    █",
             ],
         )
 
@@ -216,9 +216,9 @@ class S_E_W(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "██████",
+                "▀▀▀▀▀▀",
                 "      ",
-                "██  ██",
+                "▄    ▄",
             ],
         )
 
@@ -231,9 +231,24 @@ class N_S_E_W(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "██  ██",
-                "     ",
-                "██  ██",
+                "▀    ▀",
+                "      ",
+                "▄    ▄",
+            ],
+        )
+
+
+class Nothing(Wall):
+    def __init__(self, pos: tuple):
+        super().__init__(pos)
+
+    def wall(self) -> str:
+        return cursor_more_line(
+            self.pos,
+            [
+                "██████",
+                "██████",
+                "██████",
             ],
         )
 
