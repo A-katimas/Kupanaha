@@ -30,13 +30,13 @@ def fix_border_tiles(maze):
             bits = int(cell, 16)
 
             if x == 0:
-                bits &= ~DIR_W
+                bits &= ~DIR_W.value
             if x == width - 1:
-                bits &= ~DIR_E
+                bits &= ~DIR_E.value
             if y == 0:
-                bits &= ~DIR_N
+                bits &= ~DIR_N.value
             if y == height - 1:
-                bits &= ~DIR_S
+                bits &= ~DIR_S.value
 
             maze.maze[y][x] = hex(bits)[2:].upper()
 

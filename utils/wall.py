@@ -119,7 +119,7 @@ class S_W(Wall):
         )
 
 
-class S_E(Wall):
+class E_S(Wall):
     def __init__(self, pos: tuple):
         super().__init__(pos)
 
@@ -134,7 +134,7 @@ class S_E(Wall):
         )
 
 
-class S_N(Wall):
+class N_S(Wall):
     def __init__(self, pos: tuple):
         super().__init__(pos)
 
@@ -179,7 +179,7 @@ class N_E_W(Wall):
         )
 
 
-class N_S_E(Wall):
+class N_E_S(Wall):
     def __init__(self, pos: tuple):
         super().__init__(pos)
 
@@ -209,7 +209,7 @@ class N_S_W(Wall):
         )
 
 
-class S_E_W(Wall):
+class E_S_W(Wall):
     def __init__(self, pos: tuple):
         super().__init__(pos)
 
@@ -224,7 +224,7 @@ class S_E_W(Wall):
         )
 
 
-class N_S_E_W(Wall):
+class N_E_S_W(Wall):
     def __init__(self, pos: tuple):
         super().__init__(pos)
 

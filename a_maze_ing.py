@@ -50,21 +50,23 @@ def main():
     press = Presentation(config, amazeing, player)
     # info(config, (2, 2))
     a_maze(
-        amazeing.print_maze, amazeing.get_theme()[0], amazeing.get_theme()[1]
+        amazeing.printable_maze,
+        amazeing.get_theme()[0],
+        amazeing.get_theme()[1],
     )
     move_cursor_to_bottom()
 
-    while player.move() != "a":
-        press.start()
+    # while player.move() != "a":
+    #     press.start()
     # cursor_more_line((1,1),amazeing.maze)
-    while player.move() != "a":
-        a_maze(
-            amazeing.print_maze,
-            amazeing.get_theme()[0],
-            amazeing.get_theme()[1],
-        )
-        press.loop()
-        player.print_self()
+    # while player.move() != "a":
+    a_maze(
+        amazeing.printable_maze,
+        amazeing.get_theme()[0],
+        amazeing.get_theme()[1],
+    )
+    # press.loop()
+    # player.print_self()
 
     move_cursor_to_bottom()
 

@@ -1,7 +1,8 @@
 from utils.wall import *
-from utils import cursor_more_line
+from utils import cursor_more_line, a_maze
 import random
-
+from enum import Enum
+from time import sleep
 
 THEMES = {
     "white": [[245, 245, 245], [80, 80, 80]],
@@ -32,12 +33,11 @@ class Maze:
         self.size = size
         self.enter = Enter
         self.exit = Exit
+        self.backcolor = [50, 50, 50]
+        self.wallcolor = [255, 255, 255]
+        self.change_theme(theme)
         self.start_print = start_print
         self.maze = self.make_a_maze()
-        self.print_maze = self.make_a_print_maze()
-        self.backcolor = []
-        self.wallcolor = []
-        self.change_theme(theme)
 
     def get_theme(self) -> tuple:
         return tuple(self.backcolor), tuple(self.wallcolor)
@@ -48,32 +48,33 @@ class Maze:
         self.backcolor = THEMES[new_theme][0]
         self.wallcolor = THEMES[new_theme][1]
 
-    def make_a_print_maze(self) -> list:
+    def update_printable_maze(self) -> list:
         result = []
 
         tile_map = {
-            "0": Nothing,
-            "1": N,
-            "2": E,
-            "3": S_W,
-            "4": S,
-            "5": N_E,
-            "6": N_W,
-            "7": S_E,
-            "8": W,
-            "9": S_N,
-            "A": E_W,
-            "B": N_S_E,
-            "C": S_E_W,
-            "D": N_E_W,
-            "E": N_S_E_W,
+            0: Nothing,
+            1: N,
+            2: E,
+            3: N_E,
+            4: S,
+            5: N_S,
+            6: E_S,
+            7: N_E_S,
+            8: W,
+            9: N_W,
+            10: E_W,
+            11: N_E_W,
+            12: S_W,
+            13: N_S_W,
+            14: E_S_W,
+            15: N_E_S_W,
         }
 
-        for row_index, row in enumerate(self.maze):
-            for col_index, cell in enumerate(row):
+        for col_index, col in enumerate(self.maze):
+            for row_index, cell in enumerate(col):
 
-                y = self.start_print[1] + col_index * 6
                 x = self.start_print[0] + row_index * 3
+                y = self.start_print[1] + col_index * 6
 
                 tile_class = tile_map.get(cell)
 
@@ -81,40 +82,118 @@ class Maze:
                     result.append(tile_class((x, y)))
                 else:
                     print(f"Valeur inconnue: {cell}")
-
-        return result
+        self.printable_maze = result
 
     def make_a_maze(self) -> list:
-        from parthing import parth_maze
-
-        self.maze = generate_maze(self.size[0], self.size[1])
-        parth_maze(self)
+        self.maze = self.generate_maze()
         return self.maze
 
+    def generate_maze(self):
+        width, height = self.size[0], self.size[1]
+        self.maze = [[0] * height for _ in range(width)]
+        # backtrack(self)
+        prims(self)
+        self.update_printable_maze()
+        # return [[hex(cell)[2:].upper() for cell in row] for row in self.maze]
 
-DIR_N, DIR_E, DIR_S, DIR_W = 0x1, 0x2, 0x4, 0x8
-OPPOSITE = {DIR_N: DIR_S, DIR_S: DIR_N, DIR_E: DIR_W, DIR_W: DIR_E}
-DELTA = {DIR_N: (0, -1), DIR_E: (1, 0), DIR_S: (0, 1), DIR_W: (-1, 0)}
+
+class Direction(Enum):
+    DIR_S = 0x4
+    DIR_N = 0x1
+    DIR_E = 0x2
+    DIR_W = 0x8
+
+    def oppo(self):
+        return {
+            Direction.DIR_N: Direction.DIR_S,
+            Direction.DIR_S: Direction.DIR_N,
+            Direction.DIR_E: Direction.DIR_W,
+            Direction.DIR_W: Direction.DIR_E,
+        }[self]
+
+    def delta(self):
+        return {
+            Direction.DIR_N: (0, -1),
+            Direction.DIR_E: (1, 0),
+            Direction.DIR_S: (0, 1),
+            Direction.DIR_W: (-1, 0),
+        }[self]
 
 
-def generate_maze(width: int, height: int) -> list:
-    maze = [[0] * width for _ in range(height)]
-    visited = [[False] * width for _ in range(height)]
+def add_pos(pos1, pos2):
+    return (pos1[0] + pos2[0], pos1[1] + pos2[1])
 
-    def carve(x, y):
-        visited[y][x] = True
-        directions = [DIR_N, DIR_E, DIR_S, DIR_W]
-        random.shuffle(directions)
 
-        for direction in directions:
-            dx, dy = DELTA[direction]
-            nx, ny = x + dx, y + dy
+def backtrack(maze: Maze):
+    stack = [(0, 0)]
+    while stack:
+        maze.update_printable_maze()
+        a_maze(maze.printable_maze, (50, 50, 50), (255, 255, 255))
+        sleep(0.02)
+        current = stack[-1]
+        dir_possible = [
+            direct
+            for direct in Direction
+            if 0 <= add_pos(current, direct.delta())[0] < maze.size[0]
+            and 0 <= add_pos(current, direct.delta())[1] < maze.size[1]
+        ]
+        dir_possible = [
+            direct
+            for direct in dir_possible
+            if maze.maze[add_pos(current, direct.delta())[0]][
+                add_pos(current, direct.delta())[1]
+            ]
+            == 0
+        ]
+        if dir_possible:
+            goal = random.choice(dir_possible)
+            maze.maze[current[0]][current[1]] += goal.value
+            next_pos = add_pos(current, goal.delta())
+            maze.maze[next_pos[0]][next_pos[1]] += goal.oppo().value
+            stack.append(next_pos)
+        else:
+            stack.pop()
 
-            if 0 <= nx < width and 0 <= ny < height and not visited[ny][nx]:
-                maze[y][x] |= direction
-                maze[ny][nx] |= OPPOSITE[direction]
-                carve(nx, ny)
 
-    carve(0, 0)
+def abs_dist(pos1, pos2):
+    return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
-    return [[hex(cell)[2:].upper() for cell in row] for row in maze]
+
+def prims(maze: Maze):
+    start = (0, 0)
+    queue = [(0, 0)]
+    while queue:
+        maze.update_printable_maze()
+        a_maze(maze.printable_maze, maze.get_theme()[0], maze.get_theme()[1])
+        sleep(0.02)
+        weight = [1] if start in queue else []
+        weight.extend([abs_dist(start, pos) for pos in queue if pos != start])
+        # a = max(weight)
+        # weight = [a - b + 1 for b in weight]
+        weight = [b**2 for b in weight]
+        print(weight, queue)
+        current = random.choices(population=queue, weights=weight)[0]
+        dir_possible = [
+            direct
+            for direct in Direction
+            if 0 <= add_pos(current, direct.delta())[0] < maze.size[0]
+            and 0 <= add_pos(current, direct.delta())[1] < maze.size[1]
+        ]
+        dir_possible = [
+            direct
+            for direct in dir_possible
+            if maze.maze[add_pos(current, direct.delta())[0]][
+                add_pos(current, direct.delta())[1]
+            ]
+            == 0
+        ]
+
+        if dir_possible:
+            for goal in dir_possible:
+                # goal = random.choice(dir_possible)
+                maze.maze[current[0]][current[1]] += goal.value
+                next_pos = add_pos(current, goal.delta())
+                maze.maze[next_pos[0]][next_pos[1]] += goal.oppo().value
+                queue.append(next_pos)
+        else:
+            queue.remove(current)
