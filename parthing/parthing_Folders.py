@@ -1,4 +1,10 @@
-from pydantic import BaseModel, Field, model_validator, field_validator, ValidationError
+from pydantic import (
+    BaseModel,
+    Field,
+    model_validator,
+    field_validator,
+    ValidationError,
+)
 from utils import color
 
 
@@ -20,9 +26,13 @@ class BaseConfig(BaseModel):
             try:
                 a, b = int(parts[0]), int(parts[1])
             except ValueError:
-                raise ValueError(color("value can't be a float", 255, 100, 100))
+                raise ValueError(
+                    color("value can't be a float", 255, 100, 100)
+                )
             if a < 0 or b < 0:
-                raise ValueError(color("the value can be negative", 255, 100, 100))
+                raise ValueError(
+                    color("the value can be negative", 255, 100, 100)
+                )
             return (a, b)
         return value
 
@@ -30,15 +40,30 @@ class BaseConfig(BaseModel):
     def parth_validation(self) -> "BaseConfig":
         if self.Entry == self.Exit:
             raise ValueError(
-                color("the entry and exit can't be on the same place", 255, 150, 150)
+                color(
+                    "the entry and exit can't be on the same place",
+                    255,
+                    150,
+                    150,
+                )
             )
         if self.Entry[0] >= self.Width or self.Exit[0] >= self.Width:
             raise ValueError(
-                color("the entry or exit can't be over the width map", 255, 150, 150)
+                color(
+                    "the entry or exit can't be over the width map",
+                    255,
+                    150,
+                    150,
+                )
             )
         if self.Entry[1] >= self.Height or self.Exit[1] >= self.Height:
             raise ValueError(
-                color("the entry or exit can't be over the height map", 255, 150, 150)
+                color(
+                    "the entry or exit can't be over the height map",
+                    255,
+                    150,
+                    150,
+                )
             )
 
         return self
@@ -55,7 +80,9 @@ def parth_file_path(file_path: str) -> dict | None:
                     continue
 
                 if line.count("=") != 1:
-                    raise ValueError(color(f"invalif line: {line}", 255, 150, 150))
+                    raise ValueError(
+                        color(f"invalif line: {line}", 255, 150, 150)
+                    )
 
                 key, value = line.split("=", 1)
                 config_dict[key.strip().upper()] = value.strip()

@@ -18,7 +18,7 @@ folders_exist = True
 try:
     open("config.txt", "r")
 
-except FileExistsError as e:
+except FileNotFoundError as e:
     print(e)
     folders_exist = False
 
@@ -38,21 +38,31 @@ def main():
     if config == None:
         return 0
     amazeing = Maze(
-        (config.Width, config.Height), config.Entry, config.Exit, (15, 15), "white"
+        (config.Width, config.Height),
+        config.Entry,
+        config.Exit,
+        (15, 15),
+        "white",
     )
     clear()
 
     player = Player([amazeing.enter[0], amazeing.enter[1]], "🦦")
     press = Presentation(config, amazeing, player)
-    #info(config, (2, 2))
-    a_maze(amazeing.print_maze, amazeing.get_theme()[0], amazeing.get_theme()[1])
+    # info(config, (2, 2))
+    a_maze(
+        amazeing.print_maze, amazeing.get_theme()[0], amazeing.get_theme()[1]
+    )
     move_cursor_to_bottom()
 
     while player.move() != "a":
         press.start()
     # cursor_more_line((1,1),amazeing.maze)
     while player.move() != "a":
-        a_maze(amazeing.print_maze, amazeing.get_theme()[0], amazeing.get_theme()[1])
+        a_maze(
+            amazeing.print_maze,
+            amazeing.get_theme()[0],
+            amazeing.get_theme()[1],
+        )
         press.loop()
         player.print_self()
 

@@ -26,6 +26,7 @@ THEMES = {
     "sunset": [[255, 200, 170], [200, 60, 20]],
 }
 
+
 class Maze:
     def __init__(self, size, Enter, Exit, start_print, theme):
         self.size = size

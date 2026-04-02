@@ -20,6 +20,7 @@ from maze import Maze
 
 DIR_N, DIR_E, DIR_S, DIR_W = 0x1, 0x2, 0x4, 0x8
 
+
 def fix_border_tiles(maze):
     height = len(maze.maze)
     width = len(maze.maze[0])
@@ -28,10 +29,14 @@ def fix_border_tiles(maze):
         for x, cell in enumerate(row):
             bits = int(cell, 16)
 
-            if x == 0:          bits &= ~DIR_W
-            if x == width - 1:  bits &= ~DIR_E
-            if y == 0:          bits &= ~DIR_N
-            if y == height - 1: bits &= ~DIR_S
+            if x == 0:
+                bits &= ~DIR_W
+            if x == width - 1:
+                bits &= ~DIR_E
+            if y == 0:
+                bits &= ~DIR_N
+            if y == height - 1:
+                bits &= ~DIR_S
 
             maze.maze[y][x] = hex(bits)[2:].upper()
 
