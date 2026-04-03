@@ -5,7 +5,7 @@ from enum import Enum
 from time import sleep
 
 THEMES = {
-    "white": [[245, 245, 245], [80, 80, 80]],
+    "white": [[245, 245, 245], [80,80,80]],
     "pink": [[255, 200, 220], [180, 40, 100]],
     "blue": [[200, 220, 255], [30, 70, 180]],
     "green": [[200, 240, 210], [30, 120, 60]],
@@ -91,8 +91,8 @@ class Maze:
     def generate_maze(self):
         width, height = self.size[0], self.size[1]
         self.maze = [[0] * height for _ in range(width)]
-        # backtrack(self)
-        prims(self)
+        backtrack(self)
+        # prims(self)
         self.update_printable_maze()
         # return [[hex(cell)[2:].upper() for cell in row] for row in self.maze]
 

@@ -1,8 +1,17 @@
 import os
+import curses
 
 
 def cursor(pos: tuple, text: str) -> str:
     return f"\033[{pos[0]};{pos[1]}H{text}"
+
+
+def cursor_hide():
+    print("\33[?251", end="")
+
+
+def cursor_shaw():
+    print("\33[?25h", end="")
 
 
 def move_cursor_to_bottom():

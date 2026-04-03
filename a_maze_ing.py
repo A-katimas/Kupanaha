@@ -11,8 +11,10 @@ from utils import (
 )
 from maze import Maze
 from utils.player import Player
+from utils.cursor import cursor_hide
 
 import sys
+
 
 folders_exist = True
 try:
@@ -57,7 +59,6 @@ def main():
     move_cursor_to_bottom()
 
     # while player.move() != "a":
-    #     press.start()
     # cursor_more_line((1,1),amazeing.maze)
     # while player.move() != "a":
     a_maze(
@@ -65,6 +66,7 @@ def main():
         amazeing.get_theme()[0],
         amazeing.get_theme()[1],
     )
+    press.start()
     # press.loop()
     # player.print_self()
 
