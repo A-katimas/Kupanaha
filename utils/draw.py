@@ -1,32 +1,75 @@
 from typing import TYPE_CHECKING
 from .wall import *
 from .color import color
+from .cursor import get_key
 
 # from .player import get_key
-from .cursor import cursor_more_line
+from .cursor import cursor_more_line, cursor
 
 import os
 
 if TYPE_CHECKING:
-    from maze.maker import Maze
     from utils import Player
     from parthing import BaseConfig
 
 
 class Presentation:
-    def __init__(self, config: "BaseConfig", mazeing: "Maze", player: "Player"):
+    def __init__(self, config: "BaseConfig", player: "Player"):
+        self.scren_size = os.get_terminal_size()
         self.config = config
-        self.mazeing = mazeing
         self.player = player
         self.info_block = InfoBlock(config, (15, 15))
+        from maze.maker import Maze
+
+        self.maze = Maze(
+            (config.Width, config.Height),
+            config.Entry,
+            config.Exit,
+            [15, 15],
+            "white",
+        )
         self.start()
+        self.loop()
 
     def start(self):
+
+        lines = self.maze.size[0] + 20
+        columns = self.maze.size[1] + 10
+
+        def good_size(line: int, columns: int) -> list[str]:
+            print("je suis la ")
+            if line >= self.scren_size.lines:
+                str_line = color(f"{line}", 255, 0, 0)
+            else:
+                str_line = color(f"{line}", 0, 255, 0)
+            if columns >= self.scren_size.columns:
+                str_columns = color(f"{columns}", 255, 0, 0)
+            else:
+                str_columns = color(f"{columns}", 0, 255, 0)
+            return [str_line, str_columns]
+
+        print(cursor((2, 2), "touch any key to see your screen"))
         print(self.info_block.wall())
+        have = good_size(lines, columns)
+        print(cursor((4, 10), f"you do have {have[0]} : x   {have[1]} : y"))
+        print(otter((1, 30)))
+        print(red_panda((1, 70)))
+        while (
+            get_key() != "\r"
+            or self.scren_size.lines <= lines
+            and self.scren_size.columns <= columns
+        ):
+            print(cursor((2, 2), "touch any key to see your screen"))
+            print(self.info_block.wall())
+            have2 = good_size(lines, columns)
+            print(
+                cursor((4, 10), f"you do have {have2[0]} : x   {have2[1]} : y")
+            )
 
     def loop(self):
-        self.info_block.pos=((1),(1))
+        self.info_block.pos = ((1), (1))
         print(self.info_block.wall())
+        self.maze.backtrack()
 
 
 class InfoBlock(Wall):
@@ -107,3 +150,62 @@ def a_maze(maze: list[Wall], backcolor: tuple, wallcolor: tuple):
             ),
             end="",
         )
+
+
+def debug_key():
+    import tty, termios, sys
+
+    fd = sys.stdin.fileno()
+    old = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd)
+        key = sys.stdin.read(1)
+        if key == "\x1b":
+            key += sys.stdin.read(2)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old)
+    print(f"raw: {repr(key)}")
+
+
+def otter(pos: tuple) -> str:
+    return cursor_more_line(
+        pos,
+        [
+            "        ⢀⣀⡤⠴⠶⠶⠒⠲⠦⢤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀",
+            "⠀⠀⠀⠀⢀⡠⠞⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠲⠤⣄⡀⠀⠀⠀⠀⠀",
+            "⠀⠀⣀⡴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⡿⠀⠀⠀⠀⠀",
+            "⠀⢾⣅⡀⠀⠀⠀⠀⣀⠀⠀⠀⠀⠀⠀⢀⡦⠤⠄⠀⠀⢻⡀⠀⠀⠀⠀⠀",
+            "⠀⠈⢹⡏⠀⠀⠐⠋⠉⠁⠀⠻⢿⠟⠁⠀⠀⢤⠀⠀⠠⠤⢷⣤⣤⢤⡄⠀",
+            "⠀⠀⣼⡤⠤⠀⠀⠘⣆⡀⠀⣀⡼⠦⣄⣀⡤⠊⠀⠀⠀⠤⣼⠟⠀⠀⢹⡂",
+            "⠀⠊⣿⡠⠆⠀⠀⠀⠈⠉⠉⠙⠤⠤⠋⠀⠀⠀⠀⠀⠀⡰⠋⠀⠀⠀⡼⠁",
+            "⠀⢀⡾⣧⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠜⠁⠀⠀⠀⣸⠁⠀",
+            "⠀⠀⠀⡼⠙⠢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⠃⠀⠀",
+            "⠀⢀⡞⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⠃⠀⠀⠀",
+            "⠀⡼⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀",
+            "⣾⠁⠀⢀⣠⡴⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀",
+            "⠈⠛⠻⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀",
+        ],
+    )
+
+
+def red_panda(pos: tuple) -> str:
+    return cursor_more_line(
+        pos,
+        [
+            "    ⢀⣀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⡀⠀",
+            "⢠⣼⡏⠉⠉⠉⠉⠛⠓⠶⢤⣶⣶⡾⣿⢿⡿⢿⡿⣿⡿⣿⢿⡿⣷⣶⣶⡤⠶⠛⠛⠉⠉⠉⠉⢹⣧⡄",
+            "⢸⡏⠙⠀⠀⢀⡀⠀⠀⠀⠀⢹⣞⣵⣛⣮⡽⣳⡽⢶⡻⣯⡿⣽⣳⣟⡎⠀⠀⠀⠀⢀⡀⠀⠀⠋⢹⡇",
+            "⠈⣿⠀⠀⠀⠈⣿⣿⣦⣀⣠⣟⠾⣜⣧⢷⣹⢧⡟⣽⡳⣝⢿⣷⣛⡾⣽⣆⣀⣴⣿⣿⠃⠀⠀⠀⣿⠀",
+            "⠀⢻⣆⠀⠀⠀⠘⣿⣿⢻⢧⢯⣻⡝⣮⢷⣫⠾⣝⡧⣟⡽⣾⣻⣽⣛⡷⣯⣟⣿⣿⠃⠀⠀⠀⢰⡟⠀",
+            "⠀⠈⢿⣆⠀⢀⣴⡟⣼⣏⢯⡷⣳⣻⡛⠾⣵⣻⡝⣾⣭⣟⡷⣻⣾⡽⢯⣷⣛⣮⣟⡶⡄⠀⣠⡿⠁⠀",
+            "⠀⠀⠈⣿⣶⢯⣳⡽⣳⢞⣯⢞⡷⣻⣦⠀⠘⣧⣟⣳⣯⠇⠀⣱⡿⣽⣻⢾⡽⣾⣭⢿⡽⣶⣿⠁⠀⠀",
+            "⠀⠀⣼⡿⣽⡺⣵⣫⢷⣻⠼⠛⣻⣿⠛⢻⣾⢿⣎⣿⡽⣷⡞⠛⣿⣗⠛⠿⢞⡷⣯⢯⣟⡷⣿⣧⠀⠀",
+            "⠀⢰⣿⣿⣯⢷⣳⠟⠋⠀⠀⢰⣿⣿⣶⠞⠃⠀⠈⠁⠀⠘⠳⣶⣿⣿⡇⠀⠀⠉⢻⣟⣾⣻⣿⣿⡆⠀",
+            "⠀⠛⢩⣿⣟⣮⠏⠀⠀⠀⠀⢸⣿⡟⠁⠀⠀⣠⣾⣷⣄⠀⠀⠈⢻⣿⡇⠀⠀⠀⠀⢹⣶⣻⣿⠉⠛⠀",
+            "⠀⠀⠐⣿⣷⣾⣀⠀⠀⠀⠀⠈⣿⣧⣀⠀⠀⠙⢿⡿⠋⠀⠀⣀⣼⣿⠁⠀⠀⠀⠀⣀⣷⣯⣿⠀⠀⠀",
+            "⠀⠀⠀⠛⠋⢿⣯⣤⣄⣀⣀⣀⣘⣿⡿⠷⣶⣶⢾⣷⣶⣶⠾⢿⣿⣃⣀⣀⣀⣀⣤⣽⡿⠙⠛⠀⠀⠀",
+            "⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠉⠉⠉⠉⢳⡄⠘⠻⣯⣾⠟⠁⢠⡞⠉⠉⠉⠉⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀",
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢶⣄⣀⣀⣠⡴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀",
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀",
+        ],
+    )

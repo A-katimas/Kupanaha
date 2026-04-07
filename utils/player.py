@@ -1,8 +1,5 @@
-from .cursor import cursor
+from .cursor import cursor, get_key
 from maze.maker import Maze
-import sys
-import tty
-import termios
 
 
 class Player:
@@ -25,17 +22,3 @@ class Player:
 
     def print_self(self):
         print(cursor(tuple(self.pos), self.sprite))
-
-
-def get_key() -> str:
-    fd = sys.stdin.fileno()
-    old = termios.tcgetattr(fd)
-    try:
-        tty.setraw(fd)
-        key = sys.stdin.read(1)
-        # Touches spéciales (flèches etc.) envoient 3 caractères
-        if key == "\x1b":
-            key += sys.stdin.read(2)
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old)
-    return key

@@ -1,5 +1,8 @@
 import os
 import curses
+import sys
+import tty
+import termios
 
 
 def cursor(pos: tuple, text: str) -> str:
@@ -29,3 +32,17 @@ def cursor_more_line(pos: tuple, lines: list[str]) -> str:
 def clear() -> None:
     print("\033[2J")
     print("\033[H")
+
+
+def get_key() -> str:
+    fd = sys.stdin.fileno()
+    old = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd)
+        key = sys.stdin.read(1)
+        # Touches spéciales (flèches etc.) envoient 3 caractères
+        if key == "\x1b":
+            key += sys.stdin.read(2)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old)
+    return key

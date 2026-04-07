@@ -39,38 +39,31 @@ def main():
     config = parth(sys.argv[1])
     if config == None:
         return 0
-    amazeing = Maze(
-        (config.Width, config.Height),
-        config.Entry,
-        config.Exit,
-        (15, 15),
-        "white",
-    )
     clear()
 
-    player = Player([amazeing.enter[0], amazeing.enter[1]], "🦦")
-    press = Presentation(config, amazeing, player)
+    player = Player([config.Entry[0], config.Entry[1]], "🦦")
+    press = Presentation(config, player)
     # info(config, (2, 2))
-    a_maze(
-        amazeing.printable_maze,
-        amazeing.get_theme()[0],
-        amazeing.get_theme()[1],
-    )
-    move_cursor_to_bottom()
+    # a_maze(
+    #    amazeing.printable_maze,
+    #    amazeing.get_theme()[0],
+    #    amazeing.get_theme()[1],
+    # )
+    # move_cursor_to_bottom()
 
     # while player.move() != "a":
     # cursor_more_line((1,1),amazeing.maze)
     # while player.move() != "a":
-    a_maze(
-        amazeing.printable_maze,
-        amazeing.get_theme()[0],
-        amazeing.get_theme()[1],
-    )
+    # a_maze(
+    #    amazeing.printable_maze,
+    #    amazeing.get_theme()[0],
+    #    amazeing.get_theme()[1],
+    # )
     press.start()
     # press.loop()
     # player.print_self()
 
-    move_cursor_to_bottom()
+    # move_cursor_to_bottom()
 
 
 if __name__ == "__main__":
