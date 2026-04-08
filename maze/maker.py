@@ -67,6 +67,7 @@ class Maze:
         Exit: tuple,
         start_print: list[int],
         theme: str,
+        folders: str,
     ):
         self.size = size
         self.enter = Enter
@@ -76,6 +77,7 @@ class Maze:
         self.change_theme(theme)
         self.start_print = start_print
         self.maze: list = self.make_a_maze()
+        self.folders = folders
 
     def get_theme(self) -> tuple:
         return tuple(self.backcolor), tuple(self.wallcolor)
@@ -109,17 +111,25 @@ class Maze:
         }
 
         for col_index, col in enumerate(self.maze):
-            for row_index, cell in enumerate(col):
+            with open("test/backtr", "r+") as f:
+                for row_index, cell in enumerate(col):
 
-                x = self.start_print[0] + row_index * 3
-                y = self.start_print[1] + col_index * 6
+                    x = self.start_print[0] + row_index * 3
+                    y = self.start_print[1] + col_index * 6
 
-                tile_class = tile_map.get(cell)
+                    tile_class = tile_map.get(cell)
 
-                if tile_class:
-                    result.append(tile_class((x, y)))
-                else:
-                    print(f"Valeur inconnue: {cell}")
+                    if tile_class:
+                        res = tile_class((x, y))
+                        print(x, y, file=f)
+                        if self.enter == (col_index, row_index):
+                            res.entre = True
+                        if self.exit == (col_index, row_index):
+                            res.exit = True
+                        result.append(res)
+
+                    else:
+                        print(f"Valeur inconnue: {cell}")
         self.printable_maze = result
 
     def make_a_maze(self) -> list:
@@ -129,8 +139,6 @@ class Maze:
     def generate_maze(self) -> list:
         width, height = self.size[0], self.size[1]
         self.maze = [[0] * height for _ in range(width)]
-        # backtrack(self)
-        # prims(self)
         self.update_printable_maze()
         return self.maze
 
@@ -141,7 +149,7 @@ class Maze:
             draw_a_maze(
                 self.printable_maze, self.get_theme()[0], self.get_theme()[1]
             )
-            sleep(0.02)
+            sleep(0.001)
             current = stack[-1]
             dir_possible = [
                 direct
@@ -174,7 +182,7 @@ class Maze:
             draw_a_maze(
                 self.printable_maze, self.get_theme()[0], self.get_theme()[1]
             )
-            sleep(0.02)
+            sleep(0.005)
             weight = [1] if start in queue else []
             weight.extend(
                 [abs_dist(start, pos) for pos in queue if pos != start]
@@ -207,3 +215,9 @@ class Maze:
                     queue.append(next_pos)
             else:
                 queue.remove(current)
+        # self.draw_in_folders()
+
+    def draw_in_folders(self):
+        with open(self.folders, "r+") as fd:
+            for i in self.maze:
+                print(i, file=fd)

@@ -22,11 +22,12 @@ class Presentation:
         self.player = player
         self.info_block = InfoBlock(config, (15, 50))
         self.maze = Maze(
-            (config.Width, config.Height),
-            config.Entry,
-            config.Exit,
+            (config.WIDTH, config.HEIGHT),
+            config.ENTRY,
+            config.EXIT,
             [12, 35],
             "white",
+            config.OUTPUT_FILE,
         )
         self.logo = [
             otter((1, 1)),
@@ -37,11 +38,10 @@ class Presentation:
 
     def start(self):
 
-        lines = self.maze.size[0] + 20
-        columns = self.maze.size[1] * 6 + 45
+        lines = (self.maze.size[0] * 3) + 10
+        columns = (self.maze.size[1] * 8) + 50
 
         def good_size(line: int, columns: int) -> list[str]:
-            print("je suis la ")
             if line >= self.scren_size.lines:
                 str_line = color(f"{line}", 255, 0, 0)
             else:
@@ -52,20 +52,24 @@ class Presentation:
                 str_columns = color(f"{columns}", 0, 255, 0)
             return [str_line, str_columns]
 
-        print(cursor((25, 50), "touch any key to see your screen"))
+        print(
+            cursor(
+                (27, 50),
+                "touch any key to see your screen",
+            )
+        )
         print(self.info_block.wall())
         have = good_size(lines, columns)
         print(cursor((13, 50), f"you do have {have[0]} : x   {have[1]} : y"))
         for e in self.logo:
             print(e.wall())
-        while (
-            get_key() != "\r"
-            or self.scren_size.lines <= lines
+        while get_key() != "\r" or (
+            self.scren_size.lines <= lines
             and self.scren_size.columns <= columns
         ):
             self.scren_size = os.get_terminal_size()
             clear()
-            print(cursor((25, 50), "touch any key to see your screen"))
+            print(cursor((27, 50), "touch any key to see your screen"))
             print(self.info_block.wall())
             have = good_size(lines, columns)
             print(
@@ -76,9 +80,9 @@ class Presentation:
                 print(e.wall())
 
     def loop(self):
-        self.info_block.pos = ((self.scren_size.lines - 15), (1))
+        self.info_block.pos = ((14), (1))
         print(self.info_block.wall())
-        self.maze.backtrack()
+        self.maze.prims()
 
     def pressentation_enter():
         pass
@@ -107,22 +111,23 @@ class InfoBlock(Wall):
             return "█ " + content + " " * padding + " █"
 
         c = self.config
-        screen = f"x : {size.lines - 10}, y : {size.columns - 10}"
+        screen = f"x : {size.lines}, y : {size.columns}"
 
         lines = [
             border_top,
             line(f"         CONFIG"),
-            line(f"      WIDTH = {color(c.Width,       150, 100, 200)}"),
-            line(f"     HEIGHT = {color(c.Height,      140, 110, 190)}"),
+            line(f"      WIDTH = {color(c.WIDTH,       150, 100, 200)}"),
+            line(f"     HEIGHT = {color(c.HEIGHT,      140, 110, 190)}"),
             line(
-                f"      ENTRY = x : {color(c.Entry[0], 130, 120, 180)} y : {color(c.Entry[1], 130, 120, 180)}"
+                f"      ENTRY = x : {color(c.ENTRY[0], 130, 120, 180)} y : {color(c.ENTRY[1], 130, 120, 180)}"
             ),
             line(
-                f"       EXIT = x : {color(c.Exit[0],  120, 130, 170)} y : {color(c.Exit[1],  120, 130, 170)}"
+                f"       EXIT = x : {color(c.EXIT[0],  120, 130, 170)} y : {color(c.EXIT[1],  120, 130, 170)}"
             ),
-            line(f"OUTPUT_FILE = {color(c.Output_file, 110, 140, 160)}"),
-            line(f"    PERFECT = {color(c.Perfect,     100, 150, 150)}"),
+            line(f"OUTPUT_FILE = {color(c.OUTPUT_FILE, 110, 140, 160)}"),
+            line(f"    PERFECT = {color(c.PERFECT,     100, 150, 150)}"),
             line(f"screen size = {color(screen,         90, 160, 140)}"),
+            line(f"       Seed = {color(c.SEED,         80, 170, 130)}"),
             border_bottom,
         ]
 
@@ -143,6 +148,11 @@ def draw_a_maze(maze: list[Wall], backcolor: tuple, wallcolor: tuple):
             ),
             end="",
         )
+        if i.exit == True:
+            print(color(i.enter_or_exit(), 50, 200, 50))
+        if i.entre == True:
+
+            print(color(i.enter_or_exit(), 200, 100, 50))
 
 
 # def debug_key():
@@ -233,8 +243,8 @@ class amazing(Wall):
             self.pos,
             [
                 " _______        ___ ___                          ___             ",
-                "|   _   |______|   Y   .---.-.-----.-----.______|   .-----.-----.",
-                "|.  1   |______|.      |  _  |-- __|  -__|______|.  |     |  _  |",
+                "|       |______|   Y   .---.-.-----.-----.______|   .-----.-----.",
+                "|.  Ω   |______|.      |  _  |-- __|  -__|______|.  |     |  _  |",
                 "|.  _   |      |. \_/  |___._|_____|_____|      |.  |__|__|___  |",
                 "|:  |   |      |:  |   |                        |:  |     |_____|",
                 "|::.|:. |      |::.|:. |                        |::.|            ",

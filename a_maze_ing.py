@@ -2,14 +2,12 @@ from parthing import parth
 from utils import (
     color,
     clear,
-    cursor,
-    cursor_more_line,
-    move_cursor_to_bottom,
     Presentation,
 )
 from maze import Maze
 from utils.player import Player
 from utils.cursor import cursor_hide
+import random
 
 import sys
 
@@ -37,9 +35,10 @@ def main():
     config = parth(sys.argv[1])
     if config == None:
         return 0
-    clear()
 
-    player = Player([config.Entry[0], config.Entry[1]], "🦦")
+    clear()
+    random.seed(config.SEED)
+    player = Player([config.ENTRY[0], config.ENTRY[1]], "🦦")
     press = Presentation(config, player)
 
     press.loop()

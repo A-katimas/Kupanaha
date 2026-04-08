@@ -9,14 +9,15 @@ from utils import color
 
 
 class BaseConfig(BaseModel):
-    Width: int = Field(..., ge=2)
-    Height: int = Field(..., ge=2)
-    Entry: tuple[int, int]
-    Exit: tuple[int, int]
-    Output_file: str = Field("dont_fgt_me_maze.txt")
-    Perfect: bool = Field(False)
+    WIDTH: int = Field(..., ge=2)
+    HEIGHT: int = Field(..., ge=2)
+    ENTRY: tuple[int, int]
+    EXIT: tuple[int, int]
+    OUTPUT_FILE: str = Field("dont_fgt_me_maze.txt")
+    PERFECT: bool = Field(False)
+    SEED: int | None = None
 
-    @field_validator("Entry", "Exit", mode="before")
+    @field_validator("ENTRY", "EXIT", mode="before")
     @classmethod
     def parse_string_to_tuple(cls, value) -> tuple:
         if isinstance(value, str):
@@ -38,7 +39,7 @@ class BaseConfig(BaseModel):
 
     @model_validator(mode="after")
     def parth_validation(self) -> "BaseConfig":
-        if self.Entry == self.Exit:
+        if self.ENTRY == self.EXIT:
             raise ValueError(
                 color(
                     "the entry and exit can't be on the same place",
@@ -47,7 +48,7 @@ class BaseConfig(BaseModel):
                     150,
                 )
             )
-        if self.Entry[0] >= self.Width or self.Exit[0] >= self.Width:
+        if self.ENTRY[0] >= self.WIDTH or self.EXIT[0] >= self.WIDTH:
             raise ValueError(
                 color(
                     "the entry or exit can't be over the width map",
@@ -56,7 +57,7 @@ class BaseConfig(BaseModel):
                     150,
                 )
             )
-        if self.Entry[1] >= self.Height or self.Exit[1] >= self.Height:
+        if self.ENTRY[1] >= self.HEIGHT or self.EXIT[1] >= self.HEIGHT:
             raise ValueError(
                 color(
                     "the entry or exit can't be over the height map",
@@ -65,7 +66,6 @@ class BaseConfig(BaseModel):
                     150,
                 )
             )
-
         return self
 
 
@@ -103,14 +103,16 @@ def parth(file_path: str) -> BaseConfig | None:
         return None
 
     try:
-        config_return = BaseConfig(
-            Width=int(config_dict["WIDTH"]),
-            Height=int(config_dict["HEIGHT"]),
-            Entry=config_dict["ENTRY"],
-            Exit=config_dict["EXIT"],
-            Output_file=config_dict.get("OUTPUT_FILE", "dont_fgt_me_maze.txt"),
-            Perfect=config_dict.get("PERFECT", "False").lower() == "true",
-        )
+        # config_return = BaseConfig(
+        #     Width=int(config_dict["WIDTH"]),
+        #     Height=int(config_dict["HEIGHT"]),
+        #     Entry=config_dict["ENTRY"],
+        #     Exit=config_dict["EXIT"],
+        #     Output_file=config_dict.get("OUTPUT_FILE", "dont_fgt_me_maze.txt"),
+        #     Perfect=config_dict.get("PERFECT", "False").lower() == "true",
+        #     Seed=config_dict.get("SEED", 123),
+        # )
+        config_return = BaseConfig(**config_dict)
     except ValidationError as e:
         print(color("Error : ", 250, 70, 70) + color(f"{e}", 200, 100, 100))
         return None
