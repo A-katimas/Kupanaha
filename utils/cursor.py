@@ -1,8 +1,8 @@
 import os
-import curses
 import sys
 import tty
 import termios
+import curses
 
 
 def cursor(pos: tuple, text: str) -> str:

@@ -1,5 +1,5 @@
 from utils.wall import *
-from utils import cursor_more_line, a_maze
+from utils import cursor_more_line, draw_a_maze
 import random
 from enum import Enum
 from time import sleep
@@ -133,13 +133,14 @@ class Maze:
         # prims(self)
         self.update_printable_maze()
         return self.maze
-        # return [[hex(cell)[2:].upper() for cell in row] for row in self.maze]
 
     def backtrack(self) -> None:
         stack = [(0, 0)]
         while stack:
             self.update_printable_maze()
-            a_maze(self.printable_maze, (50, 50, 50), (255, 255, 255))
+            draw_a_maze(
+                self.printable_maze, self.get_theme()[0], self.get_theme()[1]
+            )
             sleep(0.02)
             current = stack[-1]
             dir_possible = [
@@ -170,7 +171,7 @@ class Maze:
         queue = [(0, 0)]
         while queue:
             self.update_printable_maze()
-            a_maze(
+            draw_a_maze(
                 self.printable_maze, self.get_theme()[0], self.get_theme()[1]
             )
             sleep(0.02)
@@ -181,7 +182,6 @@ class Maze:
             # a = max(weight)
             # weight = [a - b + 1 for b in weight]
             weight = [b**2 for b in weight]
-            print(weight, queue)
             current = random.choices(population=queue, weights=weight)[0]
             dir_possible = [
                 direct

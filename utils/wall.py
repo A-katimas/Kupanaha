@@ -9,6 +9,9 @@ class Wall(ABC):
         self.x = pos[0]
         self.y = pos[1]
 
+    def resise(self, x: int, y: int):
+        self.pos = (x, y)
+
     @abstractmethod
     def wall(self) -> str:
         pass

@@ -1,8 +1,6 @@
 from parthing import parth
 from utils import (
     color,
-    info,
-    a_maze,
     clear,
     cursor,
     cursor_more_line,
@@ -43,24 +41,8 @@ def main():
 
     player = Player([config.Entry[0], config.Entry[1]], "🦦")
     press = Presentation(config, player)
-    # info(config, (2, 2))
-    # a_maze(
-    #    amazeing.printable_maze,
-    #    amazeing.get_theme()[0],
-    #    amazeing.get_theme()[1],
-    # )
-    # move_cursor_to_bottom()
 
-    # while player.move() != "a":
-    # cursor_more_line((1,1),amazeing.maze)
-    # while player.move() != "a":
-    # a_maze(
-    #    amazeing.printable_maze,
-    #    amazeing.get_theme()[0],
-    #    amazeing.get_theme()[1],
-    # )
-    press.start()
-    # press.loop()
+    press.loop()
     # player.print_self()
 
     # move_cursor_to_bottom()

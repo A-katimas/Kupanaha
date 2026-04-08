@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 from .wall import *
 from .color import color
-from .cursor import get_key
+from .cursor import get_key, clear
 
 # from .player import get_key
 from .cursor import cursor_more_line, cursor
@@ -15,26 +15,30 @@ if TYPE_CHECKING:
 
 class Presentation:
     def __init__(self, config: "BaseConfig", player: "Player"):
+        from maze.maker import Maze
+
         self.scren_size = os.get_terminal_size()
         self.config = config
         self.player = player
-        self.info_block = InfoBlock(config, (15, 15))
-        from maze.maker import Maze
-
+        self.info_block = InfoBlock(config, (15, 50))
         self.maze = Maze(
             (config.Width, config.Height),
             config.Entry,
             config.Exit,
-            [15, 15],
+            [12, 35],
             "white",
         )
+        self.logo = [
+            otter((1, 1)),
+            amazing((1, 40)),
+            red_panda((1, self.scren_size.columns - 45)),
+        ]
         self.start()
-        self.loop()
 
     def start(self):
 
         lines = self.maze.size[0] + 20
-        columns = self.maze.size[1] + 10
+        columns = self.maze.size[1] * 6 + 45
 
         def good_size(line: int, columns: int) -> list[str]:
             print("je suis la ")
@@ -48,28 +52,36 @@ class Presentation:
                 str_columns = color(f"{columns}", 0, 255, 0)
             return [str_line, str_columns]
 
-        print(cursor((2, 2), "touch any key to see your screen"))
+        print(cursor((25, 50), "touch any key to see your screen"))
         print(self.info_block.wall())
         have = good_size(lines, columns)
-        print(cursor((4, 10), f"you do have {have[0]} : x   {have[1]} : y"))
-        print(otter((1, 30)))
-        print(red_panda((1, 70)))
+        print(cursor((13, 50), f"you do have {have[0]} : x   {have[1]} : y"))
+        for e in self.logo:
+            print(e.wall())
         while (
             get_key() != "\r"
             or self.scren_size.lines <= lines
             and self.scren_size.columns <= columns
         ):
-            print(cursor((2, 2), "touch any key to see your screen"))
+            self.scren_size = os.get_terminal_size()
+            clear()
+            print(cursor((25, 50), "touch any key to see your screen"))
             print(self.info_block.wall())
-            have2 = good_size(lines, columns)
+            have = good_size(lines, columns)
             print(
-                cursor((4, 10), f"you do have {have2[0]} : x   {have2[1]} : y")
+                cursor((13, 50), f"you do have {have[0]} : x   {have[1]} : y")
             )
+            self.logo[2].pos = ((1), (self.scren_size.columns - 45))
+            for e in self.logo:
+                print(e.wall())
 
     def loop(self):
-        self.info_block.pos = ((1), (1))
+        self.info_block.pos = ((self.scren_size.lines - 15), (1))
         print(self.info_block.wall())
         self.maze.backtrack()
+
+    def pressentation_enter():
+        pass
 
 
 class InfoBlock(Wall):
@@ -117,26 +129,7 @@ class InfoBlock(Wall):
         return cursor_more_line(self.pos, lines)
 
 
-def info(config: "BaseConfig", pos: tuple):
-    size = os.get_terminal_size()
-    print(
-        cursor_more_line(
-            pos,
-            [
-                "         CONFIG",
-                f"      WIDTH = {color(config.Width,150,100,200)}",
-                f"     HEIGHT = {color(config.Height,140,110,190)}",
-                f"      ENTRY = x : {color(config.Entry[0],130,120,180)} y : {color(config.Entry[1],130,120,180)}",
-                f"       EXIT = x : {color(config.Exit[0],120,130,170)} y : {color(config.Exit[1],120,130,170)}",
-                f"OUTPUT_FILE = {color(config.Output_file,110,140,160)}",
-                f"    PERFECT = {color(config.Perfect,100,150,150)}",
-                f"screen size = {color(f"x : {size.lines - 10},y : {size.columns - 10}",90,160,140)} ",
-            ],
-        )
-    )
-
-
-def a_maze(maze: list[Wall], backcolor: tuple, wallcolor: tuple):
+def draw_a_maze(maze: list[Wall], backcolor: tuple, wallcolor: tuple):
     r = 0
     g = 0
     b = 0
@@ -152,60 +145,99 @@ def a_maze(maze: list[Wall], backcolor: tuple, wallcolor: tuple):
         )
 
 
-def debug_key():
-    import tty, termios, sys
+# def debug_key():
+#     import tty, termios, sys
 
-    fd = sys.stdin.fileno()
-    old = termios.tcgetattr(fd)
-    try:
-        tty.setraw(fd)
-        key = sys.stdin.read(1)
-        if key == "\x1b":
-            key += sys.stdin.read(2)
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old)
-    print(f"raw: {repr(key)}")
-
-
-def otter(pos: tuple) -> str:
-    return cursor_more_line(
-        pos,
-        [
-            "        ⢀⣀⡤⠴⠶⠶⠒⠲⠦⢤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀",
-            "⠀⠀⠀⠀⢀⡠⠞⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠲⠤⣄⡀⠀⠀⠀⠀⠀",
-            "⠀⠀⣀⡴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⡿⠀⠀⠀⠀⠀",
-            "⠀⢾⣅⡀⠀⠀⠀⠀⣀⠀⠀⠀⠀⠀⠀⢀⡦⠤⠄⠀⠀⢻⡀⠀⠀⠀⠀⠀",
-            "⠀⠈⢹⡏⠀⠀⠐⠋⠉⠁⠀⠻⢿⠟⠁⠀⠀⢤⠀⠀⠠⠤⢷⣤⣤⢤⡄⠀",
-            "⠀⠀⣼⡤⠤⠀⠀⠘⣆⡀⠀⣀⡼⠦⣄⣀⡤⠊⠀⠀⠀⠤⣼⠟⠀⠀⢹⡂",
-            "⠀⠊⣿⡠⠆⠀⠀⠀⠈⠉⠉⠙⠤⠤⠋⠀⠀⠀⠀⠀⠀⡰⠋⠀⠀⠀⡼⠁",
-            "⠀⢀⡾⣧⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠜⠁⠀⠀⠀⣸⠁⠀",
-            "⠀⠀⠀⡼⠙⠢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⠃⠀⠀",
-            "⠀⢀⡞⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⠃⠀⠀⠀",
-            "⠀⡼⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀",
-            "⣾⠁⠀⢀⣠⡴⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀",
-            "⠈⠛⠻⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀",
-        ],
-    )
+#     fd = sys.stdin.fileno()
+#     old = termios.tcgetattr(fd)
+#     try:
+#         tty.setraw(fd)
+#         key = sys.stdin.read(1)
+#         if key == "\x1b":
+#             key += sys.stdin.read(2)
+#     finally:
+#         termios.tcsetattr(fd, termios.TCSADRAIN, old)
+#     print(f"raw: {repr(key)}")
 
 
-def red_panda(pos: tuple) -> str:
-    return cursor_more_line(
-        pos,
-        [
-            "    ⢀⣀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⡀⠀",
-            "⢠⣼⡏⠉⠉⠉⠉⠛⠓⠶⢤⣶⣶⡾⣿⢿⡿⢿⡿⣿⡿⣿⢿⡿⣷⣶⣶⡤⠶⠛⠛⠉⠉⠉⠉⢹⣧⡄",
-            "⢸⡏⠙⠀⠀⢀⡀⠀⠀⠀⠀⢹⣞⣵⣛⣮⡽⣳⡽⢶⡻⣯⡿⣽⣳⣟⡎⠀⠀⠀⠀⢀⡀⠀⠀⠋⢹⡇",
-            "⠈⣿⠀⠀⠀⠈⣿⣿⣦⣀⣠⣟⠾⣜⣧⢷⣹⢧⡟⣽⡳⣝⢿⣷⣛⡾⣽⣆⣀⣴⣿⣿⠃⠀⠀⠀⣿⠀",
-            "⠀⢻⣆⠀⠀⠀⠘⣿⣿⢻⢧⢯⣻⡝⣮⢷⣫⠾⣝⡧⣟⡽⣾⣻⣽⣛⡷⣯⣟⣿⣿⠃⠀⠀⠀⢰⡟⠀",
-            "⠀⠈⢿⣆⠀⢀⣴⡟⣼⣏⢯⡷⣳⣻⡛⠾⣵⣻⡝⣾⣭⣟⡷⣻⣾⡽⢯⣷⣛⣮⣟⡶⡄⠀⣠⡿⠁⠀",
-            "⠀⠀⠈⣿⣶⢯⣳⡽⣳⢞⣯⢞⡷⣻⣦⠀⠘⣧⣟⣳⣯⠇⠀⣱⡿⣽⣻⢾⡽⣾⣭⢿⡽⣶⣿⠁⠀⠀",
-            "⠀⠀⣼⡿⣽⡺⣵⣫⢷⣻⠼⠛⣻⣿⠛⢻⣾⢿⣎⣿⡽⣷⡞⠛⣿⣗⠛⠿⢞⡷⣯⢯⣟⡷⣿⣧⠀⠀",
-            "⠀⢰⣿⣿⣯⢷⣳⠟⠋⠀⠀⢰⣿⣿⣶⠞⠃⠀⠈⠁⠀⠘⠳⣶⣿⣿⡇⠀⠀⠉⢻⣟⣾⣻⣿⣿⡆⠀",
-            "⠀⠛⢩⣿⣟⣮⠏⠀⠀⠀⠀⢸⣿⡟⠁⠀⠀⣠⣾⣷⣄⠀⠀⠈⢻⣿⡇⠀⠀⠀⠀⢹⣶⣻⣿⠉⠛⠀",
-            "⠀⠀⠐⣿⣷⣾⣀⠀⠀⠀⠀⠈⣿⣧⣀⠀⠀⠙⢿⡿⠋⠀⠀⣀⣼⣿⠁⠀⠀⠀⠀⣀⣷⣯⣿⠀⠀⠀",
-            "⠀⠀⠀⠛⠋⢿⣯⣤⣄⣀⣀⣀⣘⣿⡿⠷⣶⣶⢾⣷⣶⣶⠾⢿⣿⣃⣀⣀⣀⣀⣤⣽⡿⠙⠛⠀⠀⠀",
-            "⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠉⠉⠉⠉⢳⡄⠘⠻⣯⣾⠟⠁⢠⡞⠉⠉⠉⠉⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀",
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢶⣄⣀⣀⣠⡴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀",
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀",
-        ],
-    )
+class otter(Wall):
+    def __init__(self, pos: tuple):
+        super().__init__(pos)
+
+    def wall(self) -> str:
+        return cursor_more_line(
+            self.pos,
+            [
+                "        ⢀⣀⡤⠴⠶⠶⠒⠲⠦⢤⣀⠀⠀⠀⠀⠀⠀⠀⠀   ",
+                "⠀⠀⠀⠀⢀⡠⠞⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠲⠤⣄⡀⠀⠀⠀⠀⠀",
+                "⠀⠀⣀⡴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⡿⠀⠀⠀⠀⠀",
+                "⠀⢾⣅⡀⠀⠀⠀⠀⣀⠀⠀⠀⠀⠀⠀⢀⡦⠤⠄⠀⠀⢻⡀⠀⠀⠀⠀⠀",
+                "⠀⠈⢹⡏⠀⠀⠐⠋⠉⠁⠀⠻⢿⠟⠁⠀⠀⢤⠀⠀⠠⠤⢷⣤⣤⢤⡄⠀",
+                "⠀⠀⣼⡤⠤⠀⠀⠘⣆⡀⠀⣀⡼⠦⣄⣀⡤⠊⠀⠀⠀⠤⣼⠟⠀⠀⢹⡂",
+                "⠀⠊⣿⡠⠆⠀⠀⠀⠈⠉⠉⠙⠤⠤⠋⠀⠀⠀⠀⠀⠀⡰⠋⠀⠀⠀⡼⠁",
+                "⠀⢀⡾⣧⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠜⠁⠀⠀⠀⣸⠁⠀",
+                "⠀⠀⠀⡼⠙⠢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⠃⠀⠀",
+                "⠀⢀⡞⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⠃⠀⠀⠀",
+                "⠀⡼⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀",
+                "⣾⠁⠀⢀⣠⡴⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀",
+                "⠈⠛⠻⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀",
+            ],
+        )
+
+
+class red_panda(Wall):
+    def __init__(self, pos: tuple):
+        super().__init__(pos)
+
+    def wall(self) -> str:
+        panda = cursor_more_line(
+            self.pos,
+            [
+                "    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠊⡁⠠⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀",
+                "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡜⢠⠁⠀⢫⡑⢄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡤⠐⠑⠆⠀⠀⠀⠀⠀⠀",
+                "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⢸⠀⢷⠀⠳⣄⠏⠢⣀⡀⢀⠀⠀⠀⢀⠴⠂⢩⠏⢀⡔⠀⠀⠀⠀⠀⠀⠀⠀",
+                "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢇⠈⣇⠼⣇⠀⢹⠟⠁⠁⠈⠉⠑⠃⠒⣷⣁⡔⠁⠀⣼⢁⠀⡌⠀⠀⠀⠀⠀⠀",
+                "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⠀⢸⡄⢘⡦⠊⠀⠀⠀⠀⠀⠀⠀⠀⠛⡏⠀⠀⣸⠻⡼⢠⠁⠀⠀⠀⠀⠀⠀",
+                "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⡏⠀⠀⢈⠞⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠢⣴⢁⠼⠇⢀⡀⠀⠀⠀⠀⠀⠀",
+                "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢘⠱⠤⢲⠀⠑⣄⣰⠗⠊⠉⠉⠱⡀⠀⠀⠀⢠⠴⠔⢤⣀⠀⠙⢅⠀⠀⣀⠇⠀⠀⠀⠀⠀⠀",
+                "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠂⠔⠀⠀⠀⣽⠃⢀⣴⣶⣄⠀⠇⠀⠀⠀⢧⠀⣀⣄⠀⠁⢄⠈⣢⠔⠀⠀⠀⠀⠀⠀⠀⠀",
+                "⠀⠀⠀⠀⠀⠀⠀⣀⡠⠤⠤⣀⡀⠀⠀⠀⣼⠇⠀⡈⣿⣿⣿⡤⠖⠒⠢⢄⣸⣿⣻⣿⢷⠀⠀⢂⠱⡇⠀⠀⠀⠀⠀⠀⠀⠀",
+                "⠀⠀⠀⠀⡠⠖⠉⠀⠀⠀⠀⠀⠉⠓⢄⠀⢿⠀⠀⣿⢿⣿⠏⠀⣤⣤⡀⠀⠙⣿⣿⣿⡿⠀⠀⢸⠀⢇⠀⠀⠀⠀⠀⠀⠀⠀",
+                "⠀⠀⡠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⣉⣩⣿⡺⢳⡀⠘⠿⢿⡄⠀⣨⣍⠀⠀⠀⣿⣾⠟⠁⠀⡠⠊⢀⠞⠀⠀⠀⠀⠀⠀⠀⠀",
+                "⠀⡜⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠋⠁⠀⣹⠀⠈⢻⣵⣦⣄⠉⠲⣬⣥⡤⠀⠚⠣⠤⠤⢒⣊⣠⠔⢛⠖⠀⠄⡀⠀⠀⠀⠀⠀",
+                "⠰⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠇⠀⢀⣼⡿⠈⠈⠉⠛⠛⠛⠛⠛⠒⠒⠛⠛⠛⠻⡿⠄⠈⠢⠑⢄⠀⠀⠀⠀⠀⠀",
+                "⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠊⠀⠀⢸⡟⡅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⡟⢄⠀⠀⠀⠀⠁⠀⠀⠀⠀⠀",
+                " ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡏⠀⠀⠀⢸⣿⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢘⡿⢷⠀⠣⡀⠀⠀⠀⠀⠀⠀⠀⠀",
+                "⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠳⡀⠀⠀⡸⠗⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⠞⠁⠸⡆⠀⠱⡀⠀⠀⠀⠀⠀⠀⠀",
+                "⢇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠒⢤⣇⠀⠀⠳⣔⠀⠀⠀⠀⠀⠀⠀⣴⠟⠁⠀⠀⠀⣿⠀⠀⠛⢄⠀⠀⠀⠀⠀⠀",
+                "⠘⣆⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠀⠀⡠⠃⢸⡆⠀⠀⠈⠷⣦⠀⠀⣀⠰⠟⣡⡤⣤⣄⡀⢠⣇⠀⠀⠀⠀⢻⠑⠠⡀⠀⠀",
+                "⠀⠙⣧⠀⠀⠀⠀⠀⠀⡮⠟⢽⢛⠁⢱⠃⣠⡞⣿⣄⣴⠋⠉⢻⡷⢴⠃⠀⢸⠁⠀⠀⠀⠙⢶⡉⠙⠲⣄⠀⠀⢃⠀⠈⢣⠀",
+                "⠀⠀⠀⠢⣀⠀⠀⠀⠀⠀⠺⡭⠏⠠⣾⣴⣿⣷⣿⠋⠋⠀⠀⣻⡇⢸⠀⠀⠘⣧⠀⠀⠀⢰⡈⣷⠀⠀⠈⢿⣄⢸⠀⠀⢸⡇",
+                "⠀⠀⠀⠀⠈⠳⢀⡀⠀⠀⠬⢧⡦⠀⢳⣾⢯⣽⣿⠀⠀⠀⣰⡟⠀⣿⠀⠀⠀⠸⣧⠀⠀⠈⠓⠛⠀⠀⠀⠰⣿⠏⠀⠀⣾⠇",
+                "⠀⠀⠀⠀⠀⢀⣀⣀⣉⣩⣷⣿⣷⣦⣼⣿⡟⢉⡇⠀⠀⢰⡟⠁⢀⡏⠀⠀⠀⢠⣿⣧⡀⠀⠀⠀⠀⠀⣀⣼⣧⣤⡶⠾⠇⠀",
+                "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠉⠉⠛⠛⠓⠿⠦⠶⠿⠷⠾⠿⠿⠶⠶⠶⠿⠿⠿⠷⠶⠶⠿⠟⠛⠉⠉⠉⠉⠀⠀⠀ ",
+            ],
+        )
+        return color(panda, 250, 128, 114)
+
+
+class amazing(Wall):
+    def __init__(self, pos: tuple):
+        super().__init__(pos)
+
+    def resise(self, x: int, y: int):
+        self.pos = (x, y)
+
+    def wall(self) -> str:
+        return cursor_more_line(
+            self.pos,
+            [
+                " _______        ___ ___                          ___             ",
+                "|   _   |______|   Y   .---.-.-----.-----.______|   .-----.-----.",
+                "|.  1   |______|.      |  _  |-- __|  -__|______|.  |     |  _  |",
+                "|.  _   |      |. \_/  |___._|_____|_____|      |.  |__|__|___  |",
+                "|:  |   |      |:  |   |                        |:  |     |_____|",
+                "|::.|:. |      |::.|:. |                        |::.|            ",
+                "`--- ---'      `--- ---'                        `---'            ",
+            ],
+        )
