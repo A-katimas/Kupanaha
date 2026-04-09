@@ -3,6 +3,7 @@ from .wall import Wall
 from .color import color, bg_color
 from .cursor import get_key, clear
 
+
 # from .player import get_key
 from .cursor import cursor_more_line, cursor
 
@@ -14,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class Presentation:
-    def __init__(self, config: "BaseConfig", player: "Player"):
+    def __init__(self, config: "BaseConfig", player: "Player") -> None:
         from maze.maker import Maze
 
         self.scren_size = os.get_terminal_size()
@@ -36,7 +37,7 @@ class Presentation:
         ]
         self.start()
 
-    def start(self):
+    def start(self) -> None:
 
         lines = (self.maze.size[0] * 3) + 10
         columns = (self.maze.size[1] * 8) + 50
@@ -79,19 +80,19 @@ class Presentation:
             for e in self.logo:
                 print(e.wall())
 
-    def loop(self):
+    def loop(self) -> None:
         self.info_block.pos = ((14), (1))
         print(self.info_block.wall())
         self.maze.prims()
 
-    def pressentation_enter():
+    def pressentation_enter(self) -> None:
         pass
 
 
 class InfoBlock(Wall):
     WIDTH = 32
 
-    def __init__(self, config: "BaseConfig", pos: tuple):
+    def __init__(self, config: "BaseConfig", pos: tuple[int, int]) -> None:
         super().__init__(pos)
         self.config = config
 
@@ -136,10 +137,14 @@ class InfoBlock(Wall):
         return cursor_more_line(self.pos, lines)
 
 
-def draw_a_maze(maze: list[Wall], backcolor: tuple, wallcolor: tuple):
+def draw_a_maze(
+    maze: list[Wall],
+    backcolor: tuple[int, int, int],
+    wallcolor: tuple[int, int, int],
+) -> None:
     r = 0
-    g = 0
-    b = 0
+    g = 1
+    b = 2
     for i in maze:
         print(
             bg_color(
@@ -173,7 +178,7 @@ def draw_a_maze(maze: list[Wall], backcolor: tuple, wallcolor: tuple):
 
 
 class otter(Wall):
-    def __init__(self, pos: tuple):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
 
     def wall(self) -> str:
@@ -198,7 +203,7 @@ class otter(Wall):
 
 
 class red_panda(Wall):
-    def __init__(self, pos: tuple):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
 
     def wall(self) -> str:
@@ -246,10 +251,10 @@ def logo_amazing() -> list[str]:
 
 
 class amazing(Wall):
-    def __init__(self, pos: tuple):
+    def __init__(self, pos: tuple[int, int]) -> None:
         super().__init__(pos)
 
-    def resise(self, x: int, y: int):
+    def resise(self, x: int, y: int) -> None:
         self.pos = (x, y)
 
     def wall(self) -> str:

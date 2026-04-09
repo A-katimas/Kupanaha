@@ -1,4 +1,4 @@
-from maze import Maze
+# from maze import Maze
 
 # tile_map = {
 #    "1": N,
@@ -17,28 +17,28 @@ from maze import Maze
 #    "E": N_E_W,
 # }
 
-DIR_N, DIR_E, DIR_S, DIR_W = 0x1, 0x2, 0x4, 0x8
+# DIR_N, DIR_E, DIR_S, DIR_W = 0x1, 0x2, 0x4, 0x8
 
 
-def fix_border_tiles(maze):
-    height = len(maze.maze)
-    width = len(maze.maze[0])
+# def fix_border_tiles(maze) -> None:
+#     height = len(maze.maze)
+#     width = len(maze.maze[0])
 
-    for y, row in enumerate(maze.maze):
-        for x, cell in enumerate(row):
-            bits = int(cell, 16)
+#     for y, row in enumerate(maze.maze):
+#         for x, cell in enumerate(row):
+#             bits = int(cell, 16)
 
-            if x == 0:
-                bits &= ~DIR_W.value
-            if x == width - 1:
-                bits &= ~DIR_E.value
-            if y == 0:
-                bits &= ~DIR_N.value
-            if y == height - 1:
-                bits &= ~DIR_S.value
+#             if x == 0:
+#                 bits &= ~DIR_W.value
+#             if x == width - 1:
+#                 bits &= ~DIR_E.value
+#             if y == 0:
+#                 bits &= ~DIR_N.value
+#             if y == height - 1:
+#                 bits &= ~DIR_S.value
 
-            maze.maze[y][x] = hex(bits)[2:].upper()
+#             maze.maze[y][x] = hex(bits)[2:].upper()
 
 
-def parth_maze(maze: Maze):
-    fix_border_tiles(maze)
+# def parth_maze(maze: Maze):
+#     fix_border_tiles(maze)

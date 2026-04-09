@@ -19,11 +19,12 @@ except FileNotFoundError as e:
     folders_exist = False
 
 
-def main():
+def main() -> None:
     if len(sys.argv) < 2:
         print(
             color(
-                f"Usage: python3 {sys.argv[0]} <item1:qty> <item2:qty> ...",
+                f"Usage: uv run python3 {sys.argv[0]} (configfolders.txt)"
+                + " or make run (configfolders.txt)",
                 255,
                 200,
                 200,
@@ -31,15 +32,14 @@ def main():
         )
         sys.exit(1)
     config = parth(sys.argv[1])
-    if config is None:
-        return 0
+    if config is not None:
+        clear()
+        random.seed(config.SEED)
+        player = Player([config.ENTRY[0], config.ENTRY[1]], "🦦")
+        press = Presentation(config, player)
 
-    clear()
-    random.seed(config.SEED)
-    player = Player([config.ENTRY[0], config.ENTRY[1]], "🦦")
-    press = Presentation(config, player)
+        press.loop()
 
-    press.loop()
     # player.print_self()
 
     # move_cursor_to_bottom()

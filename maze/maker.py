@@ -2,12 +2,13 @@ import utils.wall as wall
 from utils import draw_a_maze
 import random
 from enum import Enum
-from time import sleep
+from functools import lru_cache
+from typing import Callable, Any
 
 THEMES = {
     "white": [[245, 245, 245], [80, 80, 80]],
-    "pink": [[255, 200, 220], [180, 40, 100]],
-    "blue": [[200, 220, 255], [30, 70, 180]],
+    "pink": [[255, 0, 250], [155, 0, 155]],
+    "blue": [[50, 50, 255], [50, 50, 150]],
     "green": [[200, 240, 210], [30, 120, 60]],
     "red": [[255, 200, 200], [180, 30, 30]],
     "yellow": [[255, 250, 200], [180, 140, 20]],
@@ -28,7 +29,11 @@ THEMES = {
 }
 
 
-def abs_dist(pos1, pos2):
+def add_pos(pos1: tuple[int, int], pos2: tuple[int, int]) -> tuple[int, int]:
+    return (pos1[0] + pos2[0], pos1[1] + pos2[1])
+
+
+def abs_dist(pos1: tuple[int, int], pos2: tuple[int, int]) -> int:
     return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
 
@@ -38,7 +43,7 @@ class Direction(Enum):
     DIR_E = 0x2
     DIR_W = 0x8
 
-    def oppo(self):
+    def oppo(self) -> "Direction":
         return {
             Direction.DIR_N: Direction.DIR_S,
             Direction.DIR_S: Direction.DIR_N,
@@ -46,7 +51,7 @@ class Direction(Enum):
             Direction.DIR_W: Direction.DIR_E,
         }[self]
 
-    def delta(self):
+    def delta(self) -> tuple[int, int]:
         return {
             Direction.DIR_N: (0, -1),
             Direction.DIR_E: (1, 0),
@@ -55,16 +60,12 @@ class Direction(Enum):
         }[self]
 
 
-def add_pos(pos1, pos2):
-    return (pos1[0] + pos2[0], pos1[1] + pos2[1])
-
-
 class Maze:
     def __init__(
         self,
-        size: tuple,
-        Enter: tuple,
-        Exit: tuple,
+        size: tuple[int, int],
+        Enter: tuple[int, int],
+        Exit: tuple[int, int],
         start_print: list[int],
         theme: str,
         folders: str,
@@ -76,11 +77,15 @@ class Maze:
         self.wallcolor = [255, 255, 255]
         self.change_theme(theme)
         self.start_print = start_print
-        self.maze: list = self.make_a_maze()
+        self.maze: list[Any] = self.make_a_maze()
         self.folders = folders
 
-    def get_theme(self) -> tuple:
-        return tuple(self.backcolor), tuple(self.wallcolor)
+    def get_tuple_theme(
+        self,
+    ) -> tuple[tuple[int, int, int], tuple[int, int, int]]:
+        back = (self.backcolor[0], self.backcolor[1], self.backcolor[2])
+        wall = (self.wallcolor[0], self.wallcolor[1], self.wallcolor[2])
+        return (back, wall)
 
     def change_theme(self, new_theme: str) -> None:
         if new_theme not in THEMES:
@@ -91,7 +96,7 @@ class Maze:
     def update_printable_maze(self) -> None:
         result = []
 
-        tile_map = {
+        tile_map: dict[int, Callable[[tuple[int, int]], wall.Wall]] = {
             0: wall.Nothing,
             1: wall.N,
             2: wall.E,
@@ -132,24 +137,26 @@ class Maze:
                         print(f"Valeur inconnue: {cell}")
         self.printable_maze = result
 
-    def make_a_maze(self) -> list:
+    def make_a_maze(self) -> list[str]:
         self.maze = self.generate_maze()
         return self.maze
 
-    def generate_maze(self) -> list:
+    def generate_maze(self) -> list[str]:
         width, height = self.size[0], self.size[1]
         self.maze = [[0] * height for _ in range(width)]
         self.update_printable_maze()
         return self.maze
 
+    @lru_cache
     def backtrack(self) -> None:
         stack = [(0, 0)]
         while stack:
             self.update_printable_maze()
             draw_a_maze(
-                self.printable_maze, self.get_theme()[0], self.get_theme()[1]
+                self.printable_maze,
+                self.get_tuple_theme()[0],
+                self.get_tuple_theme()[1],
             )
-            sleep(0.001)
             current = stack[-1]
             dir_possible = [
                 direct
@@ -174,15 +181,17 @@ class Maze:
             else:
                 stack.pop()
 
+    @lru_cache
     def prims(self) -> None:
         start = (0, 0)
         queue = [(0, 0)]
         while queue:
             self.update_printable_maze()
             draw_a_maze(
-                self.printable_maze, self.get_theme()[0], self.get_theme()[1]
+                self.printable_maze,
+                self.get_tuple_theme()[0],
+                self.get_tuple_theme()[1],
             )
-            sleep(0.005)
             weight = [1] if start in queue else []
             weight.extend(
                 [abs_dist(start, pos) for pos in queue if pos != start]
@@ -217,7 +226,7 @@ class Maze:
                 queue.remove(current)
         # self.draw_in_folders()
 
-    def draw_in_folders(self):
+    def draw_in_folders(self) -> None:
         with open(self.folders, "r+") as fd:
             for i in self.maze:
                 print(i, file=fd)

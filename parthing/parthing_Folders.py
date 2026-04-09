@@ -6,6 +6,7 @@ from pydantic import (
     ValidationError,
 )
 from utils import color
+from typing import Any
 
 
 class BaseConfig(BaseModel):
@@ -19,7 +20,9 @@ class BaseConfig(BaseModel):
 
     @field_validator("ENTRY", "EXIT", mode="before")
     @classmethod
-    def parse_string_to_tuple(cls, value) -> tuple:
+    def parse_string_to_tuple(
+        cls, value: tuple[int, int] | str
+    ) -> tuple[int, int]:
         if isinstance(value, str):
             parts = value.split(",")
             if len(parts) != 2:
@@ -69,7 +72,7 @@ class BaseConfig(BaseModel):
         return self
 
 
-def parth_file_path(file_path: str) -> dict | None:
+def parth_file_path(file_path: str) -> dict[str, Any] | None:
     config_dict = {}
     required_keys = {"WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE"}
     try:

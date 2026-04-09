@@ -1,20 +1,39 @@
-NAME = a_maze_ing.py
-
-OBJ = $(SOURCE:.c=.o)
-
-
-install:
-	
+PYTHON = python3
+UV = uv
+SRC = a_maze_ing.py
+VENV = .venv
+CONFIG ?= config.txt
 
 run:
-	uv run python3 $(NAME)
+	if [ -f "$(CONFIG)" ]; then \
+		uv run $(SRC) $(CONFIG); \
+	else \
+		echo "⚠️  Fichier $(CONFIG) introuvable, lancement sans config..."; \
+		uv run $(SRC); \
+	fi
+
+install:
+	@if [ ! -d $(VENV) ]; then \
+		echo "Création de l'environnement..."; \
+		uv sync --extra dev; \
+	fi
 
 debug:
+	@uv run python -m pdb $(SRC)
 
 clean:
-	rm -rf $(OBJ)
+	@find . -type d -name "__pycache__" -exec rm -rf {} +
+	@find . -name "*.pyc" -delete
+	@rm -rf $(VENV)
+	echo "all is clear"
+
+lint:
+	@uv run $(PYTHON) -m flake8 . --extend-exclude .venv
+	@uv run $(PYTHON) -m mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 
-re: fclean all
+lint-strict:
+	@uv run $(PYTHON) -m flake8 . --extend-exclude .venv
+	@uv run $(PYTHON) -m mypy . --strict
 
-.PHONY : all clean fclean re
+.PHONY: run install debug clean lint lint-strict

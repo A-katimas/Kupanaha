@@ -3,20 +3,20 @@ from .cursor import cursor_more_line
 
 
 class Wall(ABC):
-    def __init__(self, pos: tuple):
+    def __init__(self, pos: tuple[int, int]) -> None:
         self.pos = pos
         self.x = pos[0]
         self.y = pos[1]
+        self.entre = False
+        self.exit = False
 
-    def resise(self, x: int, y: int):
+    def resise(self, x: int, y: int) -> None:
         self.pos = (x, y)
 
     @abstractmethod
     def wall(self) -> str:
         pass
 
-
-class donjon:
     def enter_or_exit(self) -> str:
         return cursor_more_line(
             (self.x + 1, self.y + 2),
@@ -24,11 +24,9 @@ class donjon:
         )
 
 
-class S(Wall, donjon):
-    def __init__(self, pos: tuple):
+class S(Wall):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
-        self.entre = False
-        self.exit = False
 
     def wall(self) -> str:
         return cursor_more_line(
@@ -41,11 +39,9 @@ class S(Wall, donjon):
         )
 
 
-class N(Wall, donjon):
-    def __init__(self, pos: tuple):
+class N(Wall):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
-        self.entre = False
-        self.exit = False
 
     def wall(self) -> str:
         return cursor_more_line(
@@ -58,11 +54,9 @@ class N(Wall, donjon):
         )
 
 
-class W(Wall, donjon):
-    def __init__(self, pos: tuple):
+class W(Wall):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
-        self.entre = False
-        self.exit = False
 
     def wall(self) -> str:
         return cursor_more_line(
@@ -75,11 +69,9 @@ class W(Wall, donjon):
         )
 
 
-class E(Wall, donjon):
-    def __init__(self, pos: tuple):
+class E(Wall):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
-        self.entre = False
-        self.exit = False
 
     def wall(self) -> str:
         return cursor_more_line(
@@ -92,11 +84,9 @@ class E(Wall, donjon):
         )
 
 
-class N_W(Wall, donjon):
-    def __init__(self, pos: tuple):
+class N_W(Wall):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
-        self.entre = False
-        self.exit = False
 
     def wall(self) -> str:
         return cursor_more_line(
@@ -109,11 +99,9 @@ class N_W(Wall, donjon):
         )
 
 
-class E_W(Wall, donjon):
-    def __init__(self, pos: tuple):
+class E_W(Wall):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
-        self.entre = False
-        self.exit = False
 
     def wall(self) -> str:
         return cursor_more_line(
@@ -126,11 +114,9 @@ class E_W(Wall, donjon):
         )
 
 
-class S_W(Wall, donjon):
-    def __init__(self, pos: tuple):
+class S_W(Wall):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
-        self.entre = False
-        self.exit = False
 
     def wall(self) -> str:
         return cursor_more_line(
@@ -143,11 +129,9 @@ class S_W(Wall, donjon):
         )
 
 
-class E_S(Wall, donjon):
-    def __init__(self, pos: tuple):
+class E_S(Wall):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
-        self.entre = False
-        self.exit = False
 
     def wall(self) -> str:
         return cursor_more_line(
@@ -160,11 +144,9 @@ class E_S(Wall, donjon):
         )
 
 
-class N_S(Wall, donjon):
-    def __init__(self, pos: tuple):
+class N_S(Wall):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
-        self.entre = False
-        self.exit = False
 
     def wall(self) -> str:
         return cursor_more_line(
@@ -177,11 +159,9 @@ class N_S(Wall, donjon):
         )
 
 
-class N_E(Wall, donjon):
-    def __init__(self, pos: tuple):
+class N_E(Wall):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
-        self.entre = False
-        self.exit = False
 
     def wall(self) -> str:
         return cursor_more_line(
@@ -194,11 +174,9 @@ class N_E(Wall, donjon):
         )
 
 
-class N_E_W(Wall, donjon):
-    def __init__(self, pos: tuple):
+class N_E_W(Wall):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
-        self.entre = False
-        self.exit = False
 
     def wall(self) -> str:
         return cursor_more_line(
@@ -211,11 +189,9 @@ class N_E_W(Wall, donjon):
         )
 
 
-class N_E_S(Wall, donjon):
-    def __init__(self, pos: tuple):
+class N_E_S(Wall):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
-        self.entre = False
-        self.exit = False
 
     def wall(self) -> str:
         return cursor_more_line(
@@ -228,11 +204,9 @@ class N_E_S(Wall, donjon):
         )
 
 
-class N_S_W(Wall, donjon):
-    def __init__(self, pos: tuple):
+class N_S_W(Wall):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
-        self.entre = False
-        self.exit = False
 
     def wall(self) -> str:
         return cursor_more_line(
@@ -245,11 +219,9 @@ class N_S_W(Wall, donjon):
         )
 
 
-class E_S_W(Wall, donjon):
-    def __init__(self, pos: tuple):
+class E_S_W(Wall):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
-        self.entre = False
-        self.exit = False
 
     def wall(self) -> str:
         return cursor_more_line(
@@ -262,11 +234,9 @@ class E_S_W(Wall, donjon):
         )
 
 
-class N_E_S_W(Wall, donjon):
-    def __init__(self, pos: tuple):
+class N_E_S_W(Wall):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
-        self.entre = False
-        self.exit = False
 
     def wall(self) -> str:
         return cursor_more_line(
@@ -279,11 +249,9 @@ class N_E_S_W(Wall, donjon):
         )
 
 
-class Nothing(Wall, donjon):
-    def __init__(self, pos: tuple):
+class Nothing(Wall):
+    def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
-        self.entre = False
-        self.exit = False
 
     def wall(self) -> str:
         return cursor_more_line(
