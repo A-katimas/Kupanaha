@@ -4,9 +4,7 @@ from utils import (
     clear,
     Presentation,
 )
-from maze import Maze
 from utils.player import Player
-from utils.cursor import cursor_hide
 import random
 
 import sys
@@ -33,7 +31,7 @@ def main():
         )
         sys.exit(1)
     config = parth(sys.argv[1])
-    if config == None:
+    if config is None:
         return 0
 
     clear()

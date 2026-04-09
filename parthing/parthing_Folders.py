@@ -99,19 +99,10 @@ def parth_file_path(file_path: str) -> dict | None:
 
 def parth(file_path: str) -> BaseConfig | None:
     config_dict = parth_file_path(file_path)
-    if config_dict == None:
+    if config_dict is None:
         return None
 
     try:
-        # config_return = BaseConfig(
-        #     Width=int(config_dict["WIDTH"]),
-        #     Height=int(config_dict["HEIGHT"]),
-        #     Entry=config_dict["ENTRY"],
-        #     Exit=config_dict["EXIT"],
-        #     Output_file=config_dict.get("OUTPUT_FILE", "dont_fgt_me_maze.txt"),
-        #     Perfect=config_dict.get("PERFECT", "False").lower() == "true",
-        #     Seed=config_dict.get("SEED", 123),
-        # )
         config_return = BaseConfig(**config_dict)
     except ValidationError as e:
         print(color("Error : ", 250, 70, 70) + color(f"{e}", 200, 100, 100))

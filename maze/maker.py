@@ -1,5 +1,5 @@
-from utils.wall import *
-from utils import cursor_more_line, draw_a_maze
+import utils.wall as wall
+from utils import draw_a_maze
 import random
 from enum import Enum
 from time import sleep
@@ -92,22 +92,22 @@ class Maze:
         result = []
 
         tile_map = {
-            0: Nothing,
-            1: N,
-            2: E,
-            3: N_E,
-            4: S,
-            5: N_S,
-            6: E_S,
-            7: N_E_S,
-            8: W,
-            9: N_W,
-            10: E_W,
-            11: N_E_W,
-            12: S_W,
-            13: N_S_W,
-            14: E_S_W,
-            15: N_E_S_W,
+            0: wall.Nothing,
+            1: wall.N,
+            2: wall.E,
+            3: wall.N_E,
+            4: wall.S,
+            5: wall.N_S,
+            6: wall.E_S,
+            7: wall.N_E_S,
+            8: wall.W,
+            9: wall.N_W,
+            10: wall.E_W,
+            11: wall.N_E_W,
+            12: wall.S_W,
+            13: wall.N_S_W,
+            14: wall.E_S_W,
+            15: wall.N_E_S_W,
         }
 
         for col_index, col in enumerate(self.maze):

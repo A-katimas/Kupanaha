@@ -1,5 +1,4 @@
 from .cursor import cursor, get_key
-from maze.maker import Maze
 
 
 class Player:

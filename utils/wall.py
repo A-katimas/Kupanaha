@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from .cursor import cursor_more_line
-from utils import bg_color, color
 
 
 class Wall(ABC):
@@ -20,7 +19,7 @@ class Wall(ABC):
 class donjon:
     def enter_or_exit(self) -> str:
         return cursor_more_line(
-            (self.x + 1, self.y+2),
+            (self.x + 1, self.y + 2),
             ["██"],
         )
 
@@ -281,7 +280,6 @@ class N_E_S_W(Wall, donjon):
 
 
 class Nothing(Wall, donjon):
-    
     def __init__(self, pos: tuple):
         super().__init__(pos)
         self.entre = False

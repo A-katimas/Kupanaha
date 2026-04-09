@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
-from .wall import *
-from .color import color
+from .wall import Wall
+from .color import color, bg_color
 from .cursor import get_key, clear
 
 # from .player import get_key
@@ -115,14 +115,16 @@ class InfoBlock(Wall):
 
         lines = [
             border_top,
-            line(f"         CONFIG"),
+            line("         CONFIG"),
             line(f"      WIDTH = {color(c.WIDTH,       150, 100, 200)}"),
             line(f"     HEIGHT = {color(c.HEIGHT,      140, 110, 190)}"),
             line(
-                f"      ENTRY = x : {color(c.ENTRY[0], 130, 120, 180)} y : {color(c.ENTRY[1], 130, 120, 180)}"
+                f"      ENTRY = x : {color(c.ENTRY[0], 130, 120, 180)}"
+                + f" y : {color(c.ENTRY[1], 130, 120, 180)}",
             ),
             line(
-                f"       EXIT = x : {color(c.EXIT[0],  120, 130, 170)} y : {color(c.EXIT[1],  120, 130, 170)}"
+                f"       EXIT = x : {color(c.EXIT[0],  120, 130, 170)}"
+                + f" y : {color(c.EXIT[1],  120, 130, 170)}",
             ),
             line(f"OUTPUT_FILE = {color(c.OUTPUT_FILE, 110, 140, 160)}"),
             line(f"    PERFECT = {color(c.PERFECT,     100, 150, 150)}"),
@@ -148,9 +150,9 @@ def draw_a_maze(maze: list[Wall], backcolor: tuple, wallcolor: tuple):
             ),
             end="",
         )
-        if i.exit == True:
+        if i.exit is True:
             print(color(i.enter_or_exit(), 50, 200, 50))
-        if i.entre == True:
+        if i.entre is True:
 
             print(color(i.enter_or_exit(), 200, 100, 50))
 
@@ -231,6 +233,18 @@ class red_panda(Wall):
         return color(panda, 250, 128, 114)
 
 
+def logo_amazing() -> list[str]:
+    return [
+        " _______        ___ ___                          ___             ",
+        "|       |______|   Y   .---.-.-----.-----.______|   .-----.-----.",
+        "|.  Ω   |______|.      |  _  |-- __|  -__|______|.  |     |  _  |",
+        "|.  _   |      |. \\_/  |___._|_____|_____|      |.  |__|__|___  |",
+        "|:  |   |      |:  |   |                        |:  |     |_____|",
+        "|::.|:. |      |::.|:. |                        |::.|            ",
+        "`--- ---'      `--- ---'                        `---'            ",
+    ]
+
+
 class amazing(Wall):
     def __init__(self, pos: tuple):
         super().__init__(pos)
@@ -241,13 +255,5 @@ class amazing(Wall):
     def wall(self) -> str:
         return cursor_more_line(
             self.pos,
-            [
-                " _______        ___ ___                          ___             ",
-                "|       |______|   Y   .---.-.-----.-----.______|   .-----.-----.",
-                "|.  Ω   |______|.      |  _  |-- __|  -__|______|.  |     |  _  |",
-                "|.  _   |      |. \_/  |___._|_____|_____|      |.  |__|__|___  |",
-                "|:  |   |      |:  |   |                        |:  |     |_____|",
-                "|::.|:. |      |::.|:. |                        |::.|            ",
-                "`--- ---'      `--- ---'                        `---'            ",
-            ],
+            logo_amazing(),
         )
