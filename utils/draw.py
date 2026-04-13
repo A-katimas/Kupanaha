@@ -86,6 +86,7 @@ class Presentation:
         self.maze.prims()
         if not self.config.PERFECT:
             self.maze.make_it_false()
+        self.maze.draw_in_folders()
         move_cursor_to_bottom()
 
     def pressentation_enter(self) -> None:

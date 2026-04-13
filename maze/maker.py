@@ -224,12 +224,17 @@ class Maze:
                     queue.append(next_pos)
             else:
                 queue.remove(current)
-        # self.draw_in_folders()
 
     def draw_in_folders(self) -> None:
-        with open(self.folders, "r+") as fd:
-            for i in self.maze:
-                print(i, file=fd)
+        with open(self.folders, "w") as fd:
+            for y in range(self.size[1]):
+                for x in range(self.size[0]):
+                    cell = hex(self.maze[x][y])[2:].upper()
+                    print(cell, end="", file=fd)
+                print(file=fd)
+            print(file=fd)
+            print(f"{self.enter[0]},{self.enter[1]}", file=fd)
+            print(f"{self.exit[0]},{self.exit[1]}", file=fd)
 
     def make_it_false(self) -> None:
         break_wall = random.randint(len(self.maze), len(self.maze) * 2)
@@ -256,7 +261,6 @@ class Maze:
 
             goal = random.choice(dir_possible)
 
-            # int directement, pas de conversion hex
             self.maze[current[0]][current[1]] |= goal.value
             next_pos = add_pos(current, goal.delta())
             self.maze[next_pos[0]][next_pos[1]] |= goal.oppo().value

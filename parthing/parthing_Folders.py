@@ -117,6 +117,8 @@ def parth(file_path: str) -> BaseConfig | None:
         print(color("Error : ", 250, 70, 70) + color(f"{e}", 200, 100, 100))
         return None
     except KeyError as e:
-        print(color("Error in key: ", 250, 70, 70) + color(f"{e}", 200, 100, 100))
+        print(
+            color("Error in key: ", 250, 70, 70) + color(f"{e}", 200, 100, 100)
+        )
         return None
     return config_return
