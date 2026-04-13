@@ -5,7 +5,7 @@ VENV = .venv
 CONFIG ?= config.txt
 
 run:
-	if [ -f "$(CONFIG)" ]; then \
+	@if [ -f "$(CONFIG)" ]; then \
 		uv run $(SRC) $(CONFIG); \
 	else \
 		echo "⚠️  Fichier $(CONFIG) introuvable, lancement sans config..."; \

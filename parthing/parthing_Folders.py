@@ -7,6 +7,7 @@ from pydantic import (
 )
 from utils import color
 from typing import Any
+from maze.maker import THEMES
 
 
 class BaseConfig(BaseModel):
@@ -17,6 +18,7 @@ class BaseConfig(BaseModel):
     OUTPUT_FILE: str = Field("dont_fgt_me_maze.txt")
     PERFECT: bool = Field(False)
     SEED: int | None = None
+    THEME: str = "white"
 
     @field_validator("ENTRY", "EXIT", mode="before")
     @classmethod
@@ -107,11 +109,14 @@ def parth(file_path: str) -> BaseConfig | None:
 
     try:
         config_return = BaseConfig(**config_dict)
+        THEMES[config_return.THEME]
     except ValidationError as e:
         print(color("Error : ", 250, 70, 70) + color(f"{e}", 200, 100, 100))
         return None
     except ValueError as e:
         print(color("Error : ", 250, 70, 70) + color(f"{e}", 200, 100, 100))
         return None
-
+    except KeyError as e:
+        print(color("Error in key: ", 250, 70, 70) + color(f"{e}", 200, 100, 100))
+        return None
     return config_return

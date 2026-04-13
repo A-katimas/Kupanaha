@@ -230,3 +230,35 @@ class Maze:
         with open(self.folders, "r+") as fd:
             for i in self.maze:
                 print(i, file=fd)
+
+    def make_it_false(self) -> None:
+        break_wall = random.randint(len(self.maze), len(self.maze) * 2)
+
+        while break_wall != 0:
+            self.update_printable_maze()
+            draw_a_maze(
+                self.printable_maze,
+                self.get_tuple_theme()[0],
+                self.get_tuple_theme()[1],
+            )
+            rand_x = random.randint(0, self.size[0] - 1)
+            rand_y = random.randint(0, self.size[1] - 1)
+            current = (rand_x, rand_y)
+
+            dir_possible = [
+                direct
+                for direct in Direction
+                if 0 <= add_pos(current, direct.delta())[0] < self.size[0]
+                and 0 <= add_pos(current, direct.delta())[1] < self.size[1]
+            ]
+            if not dir_possible:
+                continue
+
+            goal = random.choice(dir_possible)
+
+            # int directement, pas de conversion hex
+            self.maze[current[0]][current[1]] |= goal.value
+            next_pos = add_pos(current, goal.delta())
+            self.maze[next_pos[0]][next_pos[1]] |= goal.oppo().value
+
+            break_wall -= 1

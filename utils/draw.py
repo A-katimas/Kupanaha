@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 from .wall import Wall
 from .color import color, bg_color
-from .cursor import get_key, clear
+from .cursor import get_key, clear, move_cursor_to_bottom
 
 
 # from .player import get_key
@@ -27,7 +27,7 @@ class Presentation:
             config.ENTRY,
             config.EXIT,
             [12, 35],
-            "white",
+            config.THEME,
             config.OUTPUT_FILE,
         )
         self.logo = [
@@ -84,6 +84,9 @@ class Presentation:
         self.info_block.pos = ((14), (1))
         print(self.info_block.wall())
         self.maze.prims()
+        if not self.config.PERFECT:
+            self.maze.make_it_false()
+        move_cursor_to_bottom()
 
     def pressentation_enter(self) -> None:
         pass
@@ -131,6 +134,7 @@ class InfoBlock(Wall):
             line(f"    PERFECT = {color(c.PERFECT,     100, 150, 150)}"),
             line(f"screen size = {color(screen,         90, 160, 140)}"),
             line(f"       Seed = {color(c.SEED,         80, 170, 130)}"),
+            line(f"      Theme = {color(c.THEME,         70, 180, 120)}"),
             border_bottom,
         ]
 
