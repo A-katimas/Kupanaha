@@ -290,7 +290,7 @@ class Maze:
             self.maze[current[0]][current[1]] |= goal.value
             self.maze[next_pos[0]][next_pos[1]] |= goal.oppo().value
 
-            break_wall -= 1 
+            break_wall -= 1
 
     def logo42(self) -> None:
         if self.size[0] < 11 and self.size[1] < 12:
