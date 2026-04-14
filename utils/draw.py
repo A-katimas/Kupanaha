@@ -83,7 +83,7 @@ class Presentation:
     def loop(self) -> None:
         self.info_block.pos = ((14), (1))
         print(self.info_block.wall())
-        self.maze.prims()
+        self.maze.backtrack()
         if not self.config.PERFECT:
             self.maze.make_it_false()
         self.maze.draw_in_folders()

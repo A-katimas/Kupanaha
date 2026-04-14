@@ -383,6 +383,8 @@ class gros_logo42_6(Wall):
                 "█▄▄▄▄█",
             ],
         )
+
+
 class gros_logo42_7(Wall):
     def __init__(self, pos: tuple[int, int]):
         super().__init__(pos)
@@ -391,9 +393,54 @@ class gros_logo42_7(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "█ ██ █",
-                "█ ██ █",
-                "█▄▄▄▄█",
+                "█▀▀▀▀▀",
+                "█ ████",
+                "█▄▄▄▄▄",
+            ],
+        )
+
+
+class gros_logo42_8(Wall):
+    def __init__(self, pos: tuple[int, int]):
+        super().__init__(pos)
+
+    def wall(self) -> str:
+        return cursor_more_line(
+            self.pos,
+            [
+                "▀ ██ █",
+                "████ █",
+                "▄▄▄▄▄█",
+            ],
+        )
+
+
+class gros_logo42_9(Wall):
+    def __init__(self, pos: tuple[int, int]):
+        super().__init__(pos)
+
+    def wall(self) -> str:
+        return cursor_more_line(
+            self.pos,
+            [
+                "█▀▀▀▀▀",
+                "█ ████",
+                "█ ██ ▄",
+            ],
+        )
+
+
+class gros_logo42_10(Wall):
+    def __init__(self, pos: tuple[int, int]):
+        super().__init__(pos)
+
+    def wall(self) -> str:
+        return cursor_more_line(
+            self.pos,
+            [
+                "▀▀▀▀▀█",
+                "████ █",
+                "▄▄▄▄▄█",
             ],
         )
 

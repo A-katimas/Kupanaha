@@ -95,17 +95,6 @@ class Maze:
 
     def update_printable_maze(self) -> None:
         result = []
-        logo_map: dict[int, Callable[[tuple[int, int]], wall.Wall]] = {
-            16: wall.petit_logo42,
-            17: wall.gros_logo42_0,
-            18: wall.gros_logo42_1,
-            19: wall.gros_logo42_2,
-            20: wall.gros_logo42_3,
-            21: wall.gros_logo42_4,
-            22: wall.gros_logo42_5,
-            23: wall.gros_logo42_6,
-            24: wall.gros_logo42_7,
-        }
         tile_map: dict[int, Callable[[tuple[int, int]], wall.Wall]] = {
             15: wall.Nothing,
             14: wall.N,
@@ -132,6 +121,16 @@ class Maze:
             22: wall.gros_logo42_5,
             23: wall.gros_logo42_6,
             24: wall.gros_logo42_7,
+            25: wall.gros_logo42_3,
+            26: wall.gros_logo42_4,
+            27: wall.gros_logo42_1,
+            28: wall.gros_logo42_8,
+            29: wall.gros_logo42_3,
+            30: wall.gros_logo42_9,
+            31: wall.gros_logo42_1,
+            32: wall.gros_logo42_2,
+            33: wall.gros_logo42_3,
+            34: wall.gros_logo42_10,
         }
 
         for col_index, col in enumerate(self.maze):
@@ -154,7 +153,6 @@ class Maze:
 
                     else:
                         result.append(wall.petit_logo42((x, y)))
-                        self.maze[y][x] = 15
         self.printable_maze = result
 
     def make_a_maze(self) -> list[str]:
@@ -164,7 +162,7 @@ class Maze:
     def generate_maze(self) -> list[str]:
         width, height = self.size[0], self.size[1]
         self.maze = [[15] * height for _ in range(width)]
-        # self.logo42()
+        self.logo42()
         self.update_printable_maze()
         return self.maze
 
@@ -172,7 +170,7 @@ class Maze:
     def backtrack(self) -> None:
         stack = [(0, 0)]
         while stack:
-            self.update_printable_mwallaze()
+            self.update_printable_maze()
             draw_a_maze(
                 self.printable_maze,
                 self.get_tuple_theme()[0],
@@ -249,8 +247,11 @@ class Maze:
         with open(self.folders, "w") as fd:
             for y in range(self.size[1]):
                 for x in range(self.size[0]):
-                    cell = hex(self.maze[x][y])[2:].upper()
-                    print(cell, end="", file=fd)
+                    if self.maze[x][y] > 15:
+                        print("F", end="", file=fd)
+                    else:
+                        cell = hex(self.maze[x][y])[2:].upper()
+                        print(cell, end="", file=fd)
                 print(file=fd)
             print(file=fd)
             print(f"{self.enter[0]},{self.enter[1]}", file=fd)
@@ -278,14 +279,18 @@ class Maze:
             ]
             if not dir_possible:
                 continue
-
             goal = random.choice(dir_possible)
 
-            self.maze[current[0]][current[1]] |= goal.value
+            if self.maze[current[0]][current[1]] > 15:
+                continue
             next_pos = add_pos(current, goal.delta())
+            if self.maze[next_pos[0]][next_pos[1]] > 15:
+                continue
+
+            self.maze[current[0]][current[1]] |= goal.value
             self.maze[next_pos[0]][next_pos[1]] |= goal.oppo().value
 
-            break_wall -= 1
+            break_wall -= 1 
 
     def logo42(self) -> None:
         if self.size[0] < 11 and self.size[1] < 12:
