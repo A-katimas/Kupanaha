@@ -4,3 +4,4 @@ ENTRY=1,1
 EXIT=4,19
 OUTPUT_FILE=maze.txt
 PERFECT=True
+THEME=matrix

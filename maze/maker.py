@@ -97,22 +97,22 @@ class Maze:
         result = []
 
         tile_map: dict[int, Callable[[tuple[int, int]], wall.Wall]] = {
-            0: wall.Nothing,
-            1: wall.N,
-            2: wall.E,
-            3: wall.N_E,
-            4: wall.S,
-            5: wall.N_S,
-            6: wall.E_S,
-            7: wall.N_E_S,
-            8: wall.W,
-            9: wall.N_W,
-            10: wall.E_W,
-            11: wall.N_E_W,
-            12: wall.S_W,
-            13: wall.N_S_W,
-            14: wall.E_S_W,
-            15: wall.N_E_S_W,
+            15: wall.Nothing,
+            14: wall.N,
+            13: wall.E,
+            12: wall.N_E,
+            11: wall.S,
+            10: wall.N_S,
+            9: wall.E_S,
+            8: wall.N_E_S,
+            7: wall.W,
+            6: wall.N_W,
+            5: wall.E_W,
+            4: wall.N_E_W,
+            3: wall.S_W,
+            2: wall.N_S_W,
+            1: wall.E_S_W,
+            0: wall.N_E_S_W,
         }
 
         for col_index, col in enumerate(self.maze):
@@ -143,7 +143,7 @@ class Maze:
 
     def generate_maze(self) -> list[str]:
         width, height = self.size[0], self.size[1]
-        self.maze = [[0] * height for _ in range(width)]
+        self.maze = [[15] * height for _ in range(width)]
         self.update_printable_maze()
         return self.maze
 
@@ -170,13 +170,13 @@ class Maze:
                 if self.maze[add_pos(current, direct.delta())[0]][
                     add_pos(current, direct.delta())[1]
                 ]
-                == 0
+                == 15
             ]
             if dir_possible:
                 goal = random.choice(dir_possible)
-                self.maze[current[0]][current[1]] += goal.value
+                self.maze[current[0]][current[1]] &= ~goal.value
                 next_pos = add_pos(current, goal.delta())
-                self.maze[next_pos[0]][next_pos[1]] += goal.oppo().value
+                self.maze[next_pos[0]][next_pos[1]] &= ~goal.oppo().value
                 stack.append(next_pos)
             else:
                 stack.pop()
@@ -212,15 +212,15 @@ class Maze:
                 if self.maze[add_pos(current, direct.delta())[0]][
                     add_pos(current, direct.delta())[1]
                 ]
-                == 0
+                == 15
             ]
 
             if dir_possible:
                 for goal in dir_possible:
                     # goal = random.choice(dir_possible)
-                    self.maze[current[0]][current[1]] += goal.value
+                    self.maze[current[0]][current[1]] &= ~goal.value
                     next_pos = add_pos(current, goal.delta())
-                    self.maze[next_pos[0]][next_pos[1]] += goal.oppo().value
+                    self.maze[next_pos[0]][next_pos[1]] &= ~goal.oppo().value
                     queue.append(next_pos)
             else:
                 queue.remove(current)
