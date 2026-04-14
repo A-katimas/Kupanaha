@@ -95,7 +95,17 @@ class Maze:
 
     def update_printable_maze(self) -> None:
         result = []
-
+        logo_map: dict[int, Callable[[tuple[int, int]], wall.Wall]] = {
+            16: wall.petit_logo42,
+            17: wall.gros_logo42_0,
+            18: wall.gros_logo42_1,
+            19: wall.gros_logo42_2,
+            20: wall.gros_logo42_3,
+            21: wall.gros_logo42_4,
+            22: wall.gros_logo42_5,
+            23: wall.gros_logo42_6,
+            24: wall.gros_logo42_7,
+        }
         tile_map: dict[int, Callable[[tuple[int, int]], wall.Wall]] = {
             15: wall.Nothing,
             14: wall.N,
@@ -113,6 +123,15 @@ class Maze:
             2: wall.N_S_W,
             1: wall.E_S_W,
             0: wall.N_E_S_W,
+            16: wall.petit_logo42,
+            17: wall.gros_logo42_0,
+            18: wall.gros_logo42_1,
+            19: wall.gros_logo42_2,
+            20: wall.gros_logo42_3,
+            21: wall.gros_logo42_4,
+            22: wall.gros_logo42_5,
+            23: wall.gros_logo42_6,
+            24: wall.gros_logo42_7,
         }
 
         for col_index, col in enumerate(self.maze):
@@ -134,7 +153,8 @@ class Maze:
                         result.append(res)
 
                     else:
-                        print(f"Valeur inconnue: {cell}")
+                        result.append(wall.petit_logo42((x, y)))
+                        self.maze[y][x] = 15
         self.printable_maze = result
 
     def make_a_maze(self) -> list[str]:
@@ -144,6 +164,7 @@ class Maze:
     def generate_maze(self) -> list[str]:
         width, height = self.size[0], self.size[1]
         self.maze = [[15] * height for _ in range(width)]
+        # self.logo42()
         self.update_printable_maze()
         return self.maze
 
@@ -151,7 +172,7 @@ class Maze:
     def backtrack(self) -> None:
         stack = [(0, 0)]
         while stack:
-            self.update_printable_maze()
+            self.update_printable_mwallaze()
             draw_a_maze(
                 self.printable_maze,
                 self.get_tuple_theme()[0],
@@ -214,7 +235,6 @@ class Maze:
                 ]
                 == 15
             ]
-
             if dir_possible:
                 for goal in dir_possible:
                     # goal = random.choice(dir_possible)
@@ -266,3 +286,37 @@ class Maze:
             self.maze[next_pos[0]][next_pos[1]] |= goal.oppo().value
 
             break_wall -= 1
+
+    def logo42(self) -> None:
+        if self.size[0] < 11 and self.size[1] < 12:
+            pos42 = (self.size[0] // 2, self.size[1] // 2)
+            if (pos42 == self.enter) or (pos42 == self.exit):
+                self.maze[pos42[0] + 1][pos42[1]] = 16
+            else:
+                self.maze[pos42[0]][pos42[1]] = 16
+        else:
+            grand_logo = [
+                (0, 0),
+                (0, 1),
+                (0, 2),
+                (1, 2),
+                (2, 2),
+                (2, 3),
+                (2, 4),
+                (4, 0),
+                (5, 0),
+                (6, 0),
+                (6, 1),
+                (6, 2),
+                (5, 2),
+                (4, 2),
+                (4, 3),
+                (4, 4),
+                (5, 4),
+                (6, 4),
+            ]
+            pos42 = ((self.size[0] // 2) - 3, (self.size[1] // 2) - 3)
+            j = 1
+            for i in grand_logo:
+                self.maze[pos42[0] + i[0]][pos42[0] + i[1]] = j + 16
+                j += 1
