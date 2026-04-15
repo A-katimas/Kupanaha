@@ -9,6 +9,8 @@ from utils import color
 from typing import Any
 from maze.maker import THEMES
 
+algodispo = {"prims": 1, "backtrack": 1, "Prims": 1, "BackTrack": 1}
+
 
 class BaseConfig(BaseModel):
     WIDTH: int = Field(..., ge=2)
@@ -18,7 +20,8 @@ class BaseConfig(BaseModel):
     OUTPUT_FILE: str = Field("dont_fgt_me_maze.txt")
     PERFECT: bool = Field(False)
     SEED: int | None = None
-    THEME: str = "white"
+    THEME: str = Field("white")
+    ALGO: str = Field("BackTrack")
 
     @field_validator("ENTRY", "EXIT", mode="before")
     @classmethod
@@ -110,6 +113,7 @@ def parth(file_path: str) -> BaseConfig | None:
     try:
         config_return = BaseConfig(**config_dict)
         THEMES[config_return.THEME]
+        algodispo[config_return.ALGO]
     except ValidationError as e:
         print(color("Error : ", 250, 70, 70) + color(f"{e}", 200, 100, 100))
         return None

@@ -87,7 +87,13 @@ class Maze:
         wall = (self.wallcolor[0], self.wallcolor[1], self.wallcolor[2])
         return (back, wall)
 
-    def change_theme(self, new_theme: str) -> None:
+    def get_theme_name(self) -> str:
+        for name, colors in THEMES.items():
+            if colors[0] == self.backcolor and colors[1] == self.wallcolor:
+                return name
+        return "white"
+
+    def change_theme(self, new_theme: str):
         if new_theme not in THEMES:
             raise ValueError(f"Thème inconnu : {new_theme}")
         self.backcolor = THEMES[new_theme][0]

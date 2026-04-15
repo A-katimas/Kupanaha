@@ -16,8 +16,9 @@ if TYPE_CHECKING:
 
 class Presentation:
     def __init__(self, config: "BaseConfig", player: "Player") -> None:
-        from maze.maker import Maze
+        from maze.maker import Maze, THEMES
 
+        self.themes = THEMES
         self.scren_size = os.get_terminal_size()
         self.config = config
         self.player = player
@@ -59,35 +60,56 @@ class Presentation:
                 "touch any key to see your screen",
             )
         )
-        print(self.info_block.wall())
+
+        print(self.info_block.wall(self.maze.get_theme_name()))
         have = good_size(lines, columns)
         print(cursor((13, 50), f"you do have {have[0]} : x   {have[1]} : y"))
         for e in self.logo:
             print(e.wall())
+
         while get_key() != "\r" or (
             self.scren_size.lines <= lines
             and self.scren_size.columns <= columns
         ):
+            if get_key() == "c":
+                self.change_theme()
             self.scren_size = os.get_terminal_size()
             clear()
             print(cursor((27, 50), "touch any key to see your screen"))
-            print(self.info_block.wall())
+            print(self.info_block.wall(self.maze.get_theme_name()))
             have = good_size(lines, columns)
             print(
                 cursor((13, 50), f"you do have {have[0]} : x   {have[1]} : y")
             )
             self.logo[2].pos = ((1), (self.scren_size.columns - 45))
+
             for e in self.logo:
                 print(e.wall())
 
     def loop(self) -> None:
         self.info_block.pos = ((14), (1))
-        print(self.info_block.wall())
-        self.maze.prims()
+        print(self.info_block.wall(self.maze.get_theme_name()))
+        tile_algo = {
+            "prims": self.maze.prims,
+            "Prims": self.maze.prims,
+            "backtrack": self.maze.backtrack,
+            "BackTrack": self.maze.backtrack,
+        }
+        algo = tile_algo.get(self.config.ALGO)
+        algo()
         if not self.config.PERFECT:
             self.maze.make_it_false()
         self.maze.draw_in_folders()
         move_cursor_to_bottom()
+
+    def change_theme(self):
+        flag = False
+        for e in self.themes:
+            if flag:
+                self.maze.change_theme(e)
+                break
+            if e == self.config.THEME:
+                flag = True
 
     def pressentation_enter(self) -> None:
         pass
@@ -100,7 +122,7 @@ class InfoBlock(Wall):
         super().__init__(pos)
         self.config = config
 
-    def wall(self) -> str:
+    def wall(self, theme: str) -> str:
         size = os.get_terminal_size()
         w = self.WIDTH
 
@@ -135,7 +157,8 @@ class InfoBlock(Wall):
             line(f"    PERFECT = {color(c.PERFECT,     100, 150, 150)}"),
             line(f"screen size = {color(screen,         90, 160, 140)}"),
             line(f"       Seed = {color(c.SEED,         80, 170, 130)}"),
-            line(f"      Theme = {color(c.THEME,         70, 180, 120)}"),
+            line(f"      Theme = {color(theme,        70, 180, 120)}"),
+            line(f" Algorithme = {color(c.ALGO,         80, 170, 140)}"),
             border_bottom,
         ]
 

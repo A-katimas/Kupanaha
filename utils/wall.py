@@ -33,11 +33,14 @@ class S(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "█▀▀▀▀█",
+                "██▀▀██",
                 "█    █",
                 "█    █",
             ],
         )
+
+
+# ◢◣◤◥
 
 
 class N(Wall):
@@ -50,7 +53,7 @@ class N(Wall):
             [
                 "█    █",
                 "█    █",
-                "█▄▄▄▄█",
+                "██▄▄██",
             ],
         )
 
@@ -63,9 +66,9 @@ class W(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "▀▀▀▀▀█",
+                "▀▀▀▀██",
                 "     █",
-                "▄▄▄▄▄█",
+                "▄▄▄▄██",
             ],
         )
 
@@ -78,9 +81,9 @@ class E(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "█▀▀▀▀▀",
+                "██▀▀▀▀",
                 "█     ",
-                "█▄▄▄▄▄",
+                "██▄▄▄▄",
             ],
         )
 
@@ -95,7 +98,7 @@ class N_W(Wall):
             [
                 "     █",
                 "     █",
-                "▄▄▄▄▄█",
+                "▄▄▄▄██",
             ],
         )
 
@@ -123,7 +126,7 @@ class S_W(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "▀▀▀▀▀█",
+                "▀▀▀▀██",
                 "     █",
                 "     █",
             ],
@@ -138,7 +141,7 @@ class E_S(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "█▀▀▀▀▀",
+                "██▀▀▀▀",
                 "█     ",
                 "█     ",
             ],
@@ -170,7 +173,7 @@ class N_E(Wall):
             [
                 "█     ",
                 "█     ",
-                "█▄▄▄▄▄",
+                "██▄▄▄▄",
             ],
         )
 
