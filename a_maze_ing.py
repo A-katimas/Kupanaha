@@ -6,7 +6,7 @@ from utils import (
 )
 from utils.player import Player
 import random
-
+from utils.cursor import move_cursor_to_bottom
 import sys
 
 
@@ -36,10 +36,13 @@ def main() -> None:
         clear()
         random.seed(config.SEED)
         player = Player([config.ENTRY[0], config.ENTRY[1]], "🦦")
-        press = Presentation(config, player)
+        try:
+            press = Presentation(config, player)
 
-        press.loop()
-
+            press.loop()
+        except ValueError as e:
+            move_cursor_to_bottom()
+            print(e)
     # player.print_self()
 
     # move_cursor_to_bottom()

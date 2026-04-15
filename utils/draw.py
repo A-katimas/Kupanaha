@@ -13,6 +13,8 @@ if TYPE_CHECKING:
     from utils import Player
     from parthing import BaseConfig
 
+maze_save: list[Wall] | None = None
+
 
 class Presentation:
     def __init__(self, config: "BaseConfig", player: "Player") -> None:
@@ -61,34 +63,56 @@ class Presentation:
             )
         )
 
-        print(self.info_block.wall(self.maze.get_theme_name()))
+        print(
+            self.info_block.block(
+                self.maze.get_theme_name(), self.config.PERFECT
+            )
+        )
         have = good_size(lines, columns)
         print(cursor((13, 50), f"you do have {have[0]} : x   {have[1]} : y"))
         for e in self.logo:
             print(e.wall())
 
-        while get_key() != "\r" or (
-            self.scren_size.lines <= lines
-            and self.scren_size.columns <= columns
-        ):
-            if get_key() == "c":
+        while True:
+            key = get_key()
+            if key == "\r" and not (
+                self.scren_size.lines <= lines
+                and self.scren_size.columns <= columns
+            ):
+                break
+            if key == "q":
+                raise ValueError("Good Bey")
+            if key == "c":
                 self.change_theme()
-            self.scren_size = os.get_terminal_size()
-            clear()
-            print(cursor((27, 50), "touch any key to see your screen"))
-            print(self.info_block.wall(self.maze.get_theme_name()))
-            have = good_size(lines, columns)
-            print(
-                cursor((13, 50), f"you do have {have[0]} : x   {have[1]} : y")
-            )
-            self.logo[2].pos = ((1), (self.scren_size.columns - 45))
+            if key:
+                self.scren_size = os.get_terminal_size()
+                clear()
+                print(cursor((27, 50), "touch any key to see your screen"))
+                print(
+                    self.info_block.block(
+                        self.maze.get_theme_name(), self.config.PERFECT
+                    )
+                )
+                have = good_size(lines, columns)
+                print(
+                    cursor(
+                        (13, 50), f"you do have {have[0]} : x   {have[1]} : y"
+                    )
+                )
+                self.logo[2].pos = ((1), (self.scren_size.columns - 45))
 
-            for e in self.logo:
-                print(e.wall())
+                for e in self.logo:
+                    print(e.wall())
 
     def loop(self) -> None:
+        global maze_save
+        set_perfect_mode = self.config.PERFECT
+        secondbloc = moveblock((30, 1))
         self.info_block.pos = ((14), (1))
-        print(self.info_block.wall(self.maze.get_theme_name()))
+        print(
+            self.info_block.block(self.maze.get_theme_name(), set_perfect_mode)
+        )
+        print(secondbloc.block(set_perfect_mode))
         tile_algo = {
             "prims": self.maze.prims,
             "Prims": self.maze.prims,
@@ -96,33 +120,88 @@ class Presentation:
             "BackTrack": self.maze.backtrack,
         }
         algo = tile_algo.get(self.config.ALGO)
-        algo()
+        if algo:
+            algo()
         if not self.config.PERFECT:
             self.maze.make_it_false()
         self.maze.draw_in_folders()
-        move_cursor_to_bottom()
+        while True:
+            key = get_key()
+            if key == "q":
+                raise ValueError("Good Bey")
+            if key == "c":
+                self.change_theme()
+                tup_theme = self.maze.get_tuple_theme()
+                maze_save = None
+                draw_a_maze(
+                    self.maze.printable_maze, tup_theme[0], tup_theme[1]
+                )
+            if key == "b":
+                self.maze.make_a_maze()
+                maze_save = None
+                draw_a_maze(
+                    self.maze.printable_maze,
+                    self.maze.get_tuple_theme()[0],
+                    self.maze.get_tuple_theme()[1],
+                )
+                maze_save = None
+                self.maze.backtrack()
+                if not set_perfect_mode:
+                    self.maze.make_it_false()
+                self.maze.draw_in_folders()
 
-    def change_theme(self):
+            if key == "i":
+                self.maze.make_a_maze()
+                maze_save = None
+                draw_a_maze(
+                    self.maze.printable_maze,
+                    self.maze.get_tuple_theme()[0],
+                    self.maze.get_tuple_theme()[1],
+                )
+                maze_save = None
+                self.maze.prims()
+                if not set_perfect_mode:
+                    self.maze.make_it_false()
+                self.maze.draw_in_folders()
+
+            if key == "p":
+                if set_perfect_mode:
+                    set_perfect_mode = False
+                else:
+                    set_perfect_mode = True
+            if key == "l":
+                pass
+            if key:
+                print(
+                    self.info_block.block(
+                        self.maze.get_theme_name(), set_perfect_mode
+                    )
+                )
+                print(secondbloc.block(set_perfect_mode))
+                move_cursor_to_bottom()
+
+    def change_theme(self) -> None:
         flag = False
         for e in self.themes:
             if flag:
                 self.maze.change_theme(e)
-                break
-            if e == self.config.THEME:
+                return
+            if e == self.maze.get_theme_name():
                 flag = True
+        self.maze.change_theme(list(self.themes.keys())[0])
 
     def pressentation_enter(self) -> None:
         pass
 
 
-class InfoBlock(Wall):
+class InfoBlock:
     WIDTH = 32
 
     def __init__(self, config: "BaseConfig", pos: tuple[int, int]) -> None:
-        super().__init__(pos)
+        self.pos = pos
         self.config = config
 
-    def wall(self, theme: str) -> str:
+    def block(self, theme: str, perfect: bool) -> str:
         size = os.get_terminal_size()
         w = self.WIDTH
 
@@ -143,8 +222,8 @@ class InfoBlock(Wall):
         lines = [
             border_top,
             line("         CONFIG"),
-            line(f"      WIDTH = {color(c.WIDTH,       150, 100, 200)}"),
-            line(f"     HEIGHT = {color(c.HEIGHT,      140, 110, 190)}"),
+            line(f"      WIDTH = {color(c.WIDTH, 150, 100, 200)}"),
+            line(f"     HEIGHT = {color(c.HEIGHT, 140, 110, 190)}"),
             line(
                 f"      ENTRY = x : {color(c.ENTRY[0], 130, 120, 180)}"
                 + f" y : {color(c.ENTRY[1], 130, 120, 180)}",
@@ -154,18 +233,63 @@ class InfoBlock(Wall):
                 + f" y : {color(c.EXIT[1],  120, 130, 170)}",
             ),
             line(f"OUTPUT_FILE = {color(c.OUTPUT_FILE, 110, 140, 160)}"),
-            line(f"    PERFECT = {color(c.PERFECT,     100, 150, 150)}"),
-            line(f"screen size = {color(screen,         90, 160, 140)}"),
-            line(f"       Seed = {color(c.SEED,         80, 170, 130)}"),
-            line(f"      Theme = {color(theme,        70, 180, 120)}"),
-            line(f" Algorithme = {color(c.ALGO,         80, 170, 140)}"),
+            line(f"    PERFECT = {color(perfect, 100, 150, 150)}"),
+            line(f"screen size = {color(screen, 90, 160, 140)}"),
+            line(f"       Seed = {color(c.SEED, 80, 170, 130)}"),
+            line(f"      Theme = {color(theme, 70, 180, 120)}"),
+            line(f" Algorithme = {color(c.ALGO, 80, 170, 140)}"),
             border_bottom,
         ]
 
         return cursor_more_line(self.pos, lines)
 
 
-maze_save: list[Wall] | None = None
+class moveblock:
+    WIDTH = 32
+
+    def __init__(self, pos: tuple[int, int]) -> None:
+        self.pos = pos
+
+    def block(self, perfectmod: bool) -> str:
+        w = self.WIDTH
+
+        border_top = "█" + "▀" * w + "█"
+        border_bottom = "█" + "▄" * w + "█"
+        if perfectmod:
+            perfectmod = False
+        else:
+            perfectmod = True
+
+        # ██ ▄▄ ▀▀
+        def line(content: str) -> str:
+            import re
+
+            clean = re.sub(r"\x1b\[[0-9;]*m", "", content)
+            padding = w - len(clean) - 2
+            return "█ " + content + " " * padding + " █"
+
+        lines = [
+            border_top,
+            line(f"           {color("change", 50, 200, 250)}"),
+            line("━" * 30),
+            line(f"      -press '{color("q", 50, 200, 100)}' to quit "),
+            line("        " + "─" * 15),
+            line(f"  -press '{color("c", 50, 200, 100)}' to change theme"),
+            line("        " + "─" * 15),
+            line(f"   -press '{color("p", 50, 200, 100)}' to change the "),
+            line(f"     perfect mode on {color(perfectmod, 90, 160, 150)}"),
+            line("        " + "─" * 15),
+            line(f"    -press '{color("i", 50, 200, 100)}' to generate"),
+            line(f"         a {color("BackTrac", 100, 150, 160)}"),
+            line("        " + "─" * 15),
+            line(f"    -press '{color("b", 50, 200, 100)}' to generate "),
+            line(f"          a {color("Prims", 110, 140, 170)}"),
+            line("        " + "─" * 15),
+            line(f" -press '{color("l", 50, 200, 100)}' to see the solver "),
+            border_bottom,
+        ]
+
+        return cursor_more_line(self.pos, lines)
 
 
 def draw_a_maze(
@@ -179,7 +303,7 @@ def draw_a_maze(
     b = 2
 
     for i in range(len(maze)):
-        if maze_save is not None and maze[i] is not maze_save[i]:
+        if maze_save is None or maze[i] is not maze_save[i]:
             print(
                 bg_color(
                     color(

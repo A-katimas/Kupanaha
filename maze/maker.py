@@ -2,7 +2,6 @@ import utils.wall as wall
 from utils import draw_a_maze
 import random
 from enum import Enum
-from functools import lru_cache
 from typing import Callable, Any
 
 THEMES = {
@@ -26,6 +25,31 @@ THEMES = {
     "sakura": [[255, 220, 230], [200, 80, 120]],
     "matrix": [[10, 20, 10], [0, 200, 50]],
     "sunset": [[255, 200, 170], [200, 60, 20]],
+    "neon": [[5, 5, 5], [255, 255, 0]],
+    "blood": [[10, 0, 0], [180, 0, 0]],
+    "toxic": [[10, 20, 5], [50, 255, 0]],
+    "sand": [[255, 240, 200], [180, 140, 80]],
+    "ash": [[50, 50, 50], [150, 150, 150]],
+    "copper": [[40, 20, 10], [180, 100, 40]],
+    "arctic": [[240, 250, 255], [150, 210, 240]],
+    "volcano": [[20, 5, 0], [255, 60, 0]],
+    "jade": [[10, 30, 20], [50, 180, 100]],
+    "rose": [[255, 230, 235], [220, 80, 100]],
+    "steel": [[20, 25, 30], [100, 130, 160]],
+    "amber": [[30, 15, 0], [255, 150, 0]],
+    "void": [[0, 0, 0], [80, 0, 180]],
+    "ghost": [[240, 240, 255], [180, 180, 220]],
+    "rust": [[30, 10, 5], [180, 70, 30]],
+    "teal": [[10, 30, 30], [0, 180, 160]],
+    "lavender": [[240, 235, 255], [130, 100, 200]],
+    "toxic_green": [[0, 15, 0], [0, 255, 80]],
+    "deep_sea": [[0, 10, 30], [0, 80, 160]],
+    "inferno": [[15, 0, 0], [255, 100, 0]],
+    "snow": [[255, 255, 255], [200, 220, 255]],
+    "poison": [[20, 0, 30], [180, 0, 255]],
+    "bronze": [[20, 10, 0], [140, 80, 20]],
+    "aurora": [[5, 15, 20], [0, 255, 180]],
+    "crimson": [[20, 0, 5], [200, 0, 50]],
 }
 
 
@@ -93,7 +117,7 @@ class Maze:
                 return name
         return "white"
 
-    def change_theme(self, new_theme: str):
+    def change_theme(self, new_theme: str) -> None:
         if new_theme not in THEMES:
             raise ValueError(f"Thème inconnu : {new_theme}")
         self.backcolor = THEMES[new_theme][0]
@@ -140,25 +164,23 @@ class Maze:
         }
 
         for col_index, col in enumerate(self.maze):
-            with open("test/backtr", "r+") as f:
-                for row_index, cell in enumerate(col):
+            for row_index, cell in enumerate(col):
 
-                    x = self.start_print[0] + row_index * 3
-                    y = self.start_print[1] + col_index * 6
+                x = self.start_print[0] + row_index * 3
+                y = self.start_print[1] + col_index * 6
 
-                    tile_class = tile_map.get(cell)
+                tile_class = tile_map.get(cell)
 
-                    if tile_class:
-                        res = tile_class((x, y))
-                        print(x, y, file=f)
-                        if self.enter == (col_index, row_index):
-                            res.entre = True
-                        if self.exit == (col_index, row_index):
-                            res.exit = True
-                        result.append(res)
+                if tile_class:
+                    res = tile_class((x, y))
+                    if self.enter == (col_index, row_index):
+                        res.entre = True
+                    if self.exit == (col_index, row_index):
+                        res.exit = True
+                    result.append(res)
 
-                    else:
-                        result.append(wall.petit_logo42((x, y)))
+                else:
+                    result.append(wall.petit_logo42((x, y)))
         self.printable_maze = result
 
     def make_a_maze(self) -> list[str]:
@@ -169,10 +191,9 @@ class Maze:
         width, height = self.size[0], self.size[1]
         self.maze = [[15] * height for _ in range(width)]
         self.logo42()
-        self.update_printable_maze()
+        # self.update_printable_maze()
         return self.maze
 
-    @lru_cache
     def backtrack(self) -> None:
         stack = [(0, 0)]
         while stack:
@@ -206,7 +227,6 @@ class Maze:
             else:
                 stack.pop()
 
-    @lru_cache
     def prims(self) -> None:
         start = (0, 0)
         queue = [(0, 0)]
