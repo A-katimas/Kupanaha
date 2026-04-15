@@ -93,7 +93,7 @@ class N_W(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "▀    █",
+                "     █",
                 "     █",
                 "▄▄▄▄▄█",
             ],
@@ -125,7 +125,7 @@ class S_W(Wall):
             [
                 "▀▀▀▀▀█",
                 "     █",
-                "▄    █",
+                "     █",
             ],
         )
 
@@ -140,7 +140,7 @@ class E_S(Wall):
             [
                 "█▀▀▀▀▀",
                 "█     ",
-                "█    ▄",
+                "█     ",
             ],
         )
 
@@ -168,7 +168,7 @@ class N_E(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "█    ▀",
+                "█     ",
                 "█     ",
                 "█▄▄▄▄▄",
             ],
@@ -183,7 +183,7 @@ class N_E_W(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "▀    ▀",
+                "      ",
                 "      ",
                 "▄▄▄▄▄▄",
             ],
@@ -198,9 +198,9 @@ class N_E_S(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "█    ▀",
                 "█     ",
-                "█    ▄",
+                "█     ",
+                "█     ",
             ],
         )
 
@@ -213,9 +213,9 @@ class N_S_W(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "▀    █",
                 "     █",
-                "▄    █",
+                "     █",
+                "     █",
             ],
         )
 
@@ -230,7 +230,7 @@ class E_S_W(Wall):
             [
                 "▀▀▀▀▀▀",
                 "      ",
-                "▄    ▄",
+                "      ",
             ],
         )
 
@@ -243,11 +243,14 @@ class N_E_S_W(Wall):
         return cursor_more_line(
             self.pos,
             [
-                "▀    ▀",
                 "      ",
-                "▄    ▄",
+                "      ",
+                "      ",
             ],
         )
+
+
+# ▄▀
 
 
 class Nothing(Wall):

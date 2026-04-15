@@ -287,8 +287,8 @@ class Maze:
             if self.maze[next_pos[0]][next_pos[1]] > 15:
                 continue
 
-            self.maze[current[0]][current[1]] |= goal.value
-            self.maze[next_pos[0]][next_pos[1]] |= goal.oppo().value
+            self.maze[current[0]][current[1]] &= ~goal.value
+            self.maze[next_pos[0]][next_pos[1]] &= ~goal.oppo().value
 
             break_wall -= 1
 
@@ -320,8 +320,21 @@ class Maze:
                 (5, 4),
                 (6, 4),
             ]
-            pos42 = ((self.size[0] // 2) - 3, (self.size[1] // 2) - 3)
-            j = 1
-            for i in grand_logo:
-                self.maze[pos42[0] + i[0]][pos42[0] + i[1]] = j + 16
-                j += 1
+            pos42 = ((self.size[0] // 2) - 3, (self.size[1] // 2) - 2)
+
+            pos_grand_logo = list(
+                (x + pos42[0], y + pos42[1]) for x, y in grand_logo
+            )
+            if not any(
+                map(lambda x: x in (self.enter, self.exit), pos_grand_logo)
+            ):
+                j = 1
+                for i in grand_logo:
+                    self.maze[pos42[0] + i[0]][pos42[1] + i[1]] = j + 16
+                    j += 1
+            else:
+                pos42 = (self.size[0] // 2, self.size[1] // 2)
+                if (pos42 == self.enter) or (pos42 == self.exit):
+                    self.maze[pos42[0] + 1][pos42[1]] = 16
+                else:
+                    self.maze[pos42[0]][pos42[1]] = 16

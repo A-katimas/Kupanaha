@@ -83,7 +83,7 @@ class Presentation:
     def loop(self) -> None:
         self.info_block.pos = ((14), (1))
         print(self.info_block.wall())
-        self.maze.backtrack()
+        self.maze.prims()
         if not self.config.PERFECT:
             self.maze.make_it_false()
         self.maze.draw_in_folders()
@@ -142,29 +142,41 @@ class InfoBlock(Wall):
         return cursor_more_line(self.pos, lines)
 
 
+maze_save: list[Wall] | None = None
+
+
 def draw_a_maze(
     maze: list[Wall],
     backcolor: tuple[int, int, int],
     wallcolor: tuple[int, int, int],
 ) -> None:
+    global maze_save
     r = 0
     g = 1
     b = 2
-    for i in maze:
-        print(
-            bg_color(
-                color(i.wall(), backcolor[r], backcolor[g], backcolor[b]),
-                wallcolor[r],
-                wallcolor[g],
-                wallcolor[b],
-            ),
-            end="",
-        )
-        if i.exit is True:
-            print(color(i.enter_or_exit(), 50, 200, 50))
-        if i.entre is True:
 
-            print(color(i.enter_or_exit(), 200, 100, 50))
+    for i in range(len(maze)):
+        if maze_save is not None and maze[i] is not maze_save[i]:
+            print(
+                bg_color(
+                    color(
+                        maze[i].wall(),
+                        backcolor[r],
+                        backcolor[g],
+                        backcolor[b],
+                    ),
+                    wallcolor[r],
+                    wallcolor[g],
+                    wallcolor[b],
+                ),
+                end="",
+            )
+            if maze[i].exit is True:
+                print(color(maze[i].enter_or_exit(), 50, 200, 50))
+            if maze[i].entre is True:
+                print(color(maze[i].enter_or_exit(), 200, 100, 50))
+
+    maze_save = list(maze)
 
 
 # def debug_key():
