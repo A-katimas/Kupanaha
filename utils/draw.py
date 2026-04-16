@@ -1,3 +1,4 @@
+from tracemalloc import start
 from typing import TYPE_CHECKING
 
 
@@ -174,16 +175,14 @@ class Presentation:
                     set_perfect_mode = False
                 else:
                     set_perfect_mode = True
+
             if key == "l":
                 from maze.solver import Solver
                 from utils.path_display import PathDrawer
                 solve = Solver(self.maze.maze, self.config)
                 self.path = solve.solve_maze()
-                if self.path:
-                    self.start_line = 0
-                    self.start_col = 0
                 pathdraw = PathDrawer(self.path)
-                pathdraw.path_draw(offset_line=self.start_line, offset_col=self.start_col)
+                pathdraw.path_draw(offset_line=25, offset_col=15)
 
 
             if key:
