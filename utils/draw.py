@@ -1,4 +1,6 @@
 from typing import TYPE_CHECKING
+
+
 from .wall import Wall
 from .color import color, bg_color
 from .cursor import get_key, clear, move_cursor_to_bottom
@@ -25,6 +27,9 @@ class Presentation:
         self.config = config
         self.player = player
         self.info_block = InfoBlock(config, (15, 50))
+        self.path = []
+        self.start_line = 0
+        self.start_col = 0
         self.maze = Maze(
             (config.WIDTH, config.HEIGHT),
             config.ENTRY,
@@ -170,7 +175,17 @@ class Presentation:
                 else:
                     set_perfect_mode = True
             if key == "l":
-                pass
+                from maze.solver import Solver
+                from utils.path_display import PathDrawer
+                solve = Solver(self.maze.maze, self.config)
+                self.path = solve.solve_maze()
+                if self.path:
+                    self.start_line = 0
+                    self.start_col = 0
+                pathdraw = PathDrawer(self.path)
+                pathdraw.path_draw(offset_line=self.start_line, offset_col=self.start_col)
+
+
             if key:
                 print(
                     self.info_block.block(
@@ -426,3 +441,5 @@ class amazing(Wall):
             self.pos,
             logo_amazing(),
         )
+
+
