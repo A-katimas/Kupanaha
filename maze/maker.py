@@ -54,20 +54,59 @@ THEMES = {
 
 
 def add_pos(pos1: tuple[int, int], pos2: tuple[int, int]) -> tuple[int, int]:
+    """
+    Add two 2D positions component-wise.
+
+    Args:
+        pos1 (tuple[int, int]): First position (x, y).
+        pos2 (tuple[int, int]): Second position (x, y).
+
+    Returns:
+        tuple[int, int]: The element-wise sum of the two positions.
+    """
     return (pos1[0] + pos2[0], pos1[1] + pos2[1])
 
 
 def abs_dist(pos1: tuple[int, int], pos2: tuple[int, int]) -> int:
+    """
+    Compute the Manhattan distance between two 2D positions.
+
+    Args:
+        pos1 (tuple[int, int]): First position (x, y).
+        pos2 (tuple[int, int]): Second position (x, y).
+
+    Returns:
+        int: The Manhattan distance between the two positions.
+    """
     return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
 
 class Direction(Enum):
+    """
+    Enumeration of the four cardinal directions used in the maze.
+
+    Each direction is associated with a bitmask value used to encode
+    the wall state of each maze cell.
+
+    Attributes:
+        DIR_N (int): North direction (bitmask 0x1).
+        DIR_E (int): East direction (bitmask 0x2).
+        DIR_S (int): South direction (bitmask 0x4).
+        DIR_W (int): West direction (bitmask 0x8).
+    """
+
     DIR_S = 0x4
     DIR_N = 0x1
     DIR_E = 0x2
     DIR_W = 0x8
 
     def oppo(self) -> "Direction":
+        """
+        Return the opposite direction.
+
+        Returns:
+            Direction: The direction opposite to the current one (N<->S, E<->W).
+        """
         return {
             Direction.DIR_N: Direction.DIR_S,
             Direction.DIR_S: Direction.DIR_N,
@@ -76,6 +115,16 @@ class Direction(Enum):
         }[self]
 
     def delta(self) -> tuple[int, int]:
+        """
+        Return the (dx, dy) movement vector associated with the direction.
+
+        Returns:
+            tuple[int, int]: The delta (dx, dy) for the direction:
+                - DIR_N : (0, -1)
+                - DIR_E : (1,  0)
+                - DIR_S : (0,  1)
+                - DIR_W : (-1, 0)
+        """
         return {
             Direction.DIR_N: (0, -1),
             Direction.DIR_E: (1, 0),
@@ -85,6 +134,26 @@ class Direction(Enum):
 
 
 class Maze:
+    """
+    Represents a procedurally generated maze with visual theme management
+    and configurable entry/exit points.
+
+    The maze is encoded as a 2D grid of integers, where each value represents
+    the wall state of a cell via a bitmask. Values above 15 denote special
+    cells (42 logo tiles).
+
+    Attributes:
+        size (tuple[int, int]): Dimensions of the maze (width, height).
+        enter (tuple[int, int]): Position of the maze entrance.
+        exit (tuple[int, int]): Position of the maze exit.
+        backcolor (list[int]): Background color as [R, G, B].
+        wallcolor (list[int]): Wall color as [R, G, B].
+        start_print (list[int]): Pixel coordinates for the top-left rendering origin.
+        maze (list[Any]): Internal 2D grid of the maze.
+        folders (str): File path used to save the maze.
+        printable_maze (list): List of wall tile objects ready for rendering.
+    """
+
     def __init__(
         self,
         size: tuple[int, int],
@@ -94,6 +163,18 @@ class Maze:
         theme: str,
         folders: str,
     ):
+        """
+        Initialize the maze with its dimensions, entry/exit points, theme,
+        and save path, then generate the initial grid.
+
+        Args:
+            size (tuple[int, int]): Dimensions of the maze (width, height).
+            Enter (tuple[int, int]): Entrance position (column, row).
+            Exit (tuple[int, int]): Exit position (column, row).
+            start_print (list[int]): Pixel coordinates for the rendering origin.
+            theme (str): Name of the color theme to apply (must exist in THEMES).
+            folders (str): File path for saving the maze.
+        """
         self.size = size
         self.enter = Enter
         self.exit = Exit
@@ -107,23 +188,61 @@ class Maze:
     def get_tuple_theme(
         self,
     ) -> tuple[tuple[int, int, int], tuple[int, int, int]]:
+        """
+        Return the current theme colors as immutable tuples.
+
+        Returns:
+            tuple[tuple[int, int, int], tuple[int, int, int]]:
+                A (backcolor, wallcolor) tuple where each element is an
+                (R, G, B) triplet.
+        """
         back = (self.backcolor[0], self.backcolor[1], self.backcolor[2])
         wall = (self.wallcolor[0], self.wallcolor[1], self.wallcolor[2])
         return (back, wall)
 
     def get_theme_name(self) -> str:
+        """
+        Return the name of the currently applied theme.
+
+        Iterates over the THEMES dictionary to find the entry matching the
+        current colors. Falls back to "white" if no match is found.
+
+        Returns:
+            str: The name of the current theme, or "white" as default.
+        """
         for name, colors in THEMES.items():
             if colors[0] == self.backcolor and colors[1] == self.wallcolor:
                 return name
         return "white"
 
     def change_theme(self, new_theme: str) -> None:
+        """
+        Apply a new color theme to the maze.
+
+        Args:
+            new_theme (str): Name of the theme to apply. Must be a valid key
+                             in the THEMES dictionary.
+
+        Raises:
+            ValueError: If the specified theme does not exist in THEMES.
+        """
         if new_theme not in THEMES:
             raise ValueError(f"Thème inconnu : {new_theme}")
         self.backcolor = THEMES[new_theme][0]
         self.wallcolor = THEMES[new_theme][1]
 
     def update_printable_maze(self) -> None:
+        """
+        Rebuild ``printable_maze`` by converting each grid cell into a
+        renderable ``wall.Wall`` tile object.
+
+        Each integer value in the grid is mapped to a tile class via a lookup
+        dictionary. Cells matching the entrance or exit positions are flagged
+        on their respective tile. Cells with no matching entry default to
+        ``wall.petit_logo42``.
+
+        Updates the ``self.printable_maze`` attribute in place.
+        """
         result = []
         tile_map: dict[int, Callable[[tuple[int, int]], wall.Wall]] = {
             15: wall.Nothing,
@@ -184,17 +303,42 @@ class Maze:
         self.printable_maze = result
 
     def make_a_maze(self) -> list[str]:
+        """
+        Generate and return the maze grid.
+
+        Delegates to ``generate_maze`` to initialize the grid and place
+        the 42 logo at the appropriate position.
+
+        Returns:
+            list[str]: The generated maze grid.
+        """
         self.maze = self.generate_maze()
         return self.maze
 
     def generate_maze(self) -> list[str]:
+        """
+        Initialize the maze grid with all cells fully walled (value 15)
+        and place the 42 logo.
+
+        Returns:
+            list[str]: A grid of dimensions ``self.size`` filled with 15,
+                       with the 42 logo placed at the center.
+        """
         width, height = self.size[0], self.size[1]
         self.maze = [[15] * height for _ in range(width)]
         self.logo42()
-        # self.update_printable_maze()
         return self.maze
 
     def backtrack(self) -> None:
+        """
+        Generate the maze using an iterative recursive backtracking algorithm
+        (depth-first search with an explicit stack).
+
+        Explores cells depth-first, randomly choosing among unvisited neighbors
+        (cells with value 15). At each step, the wall between the current cell
+        and the chosen neighbor is removed in both directions. The maze is
+        rendered at every iteration via ``draw_a_maze``.
+        """
         stack = [(0, 0)]
         while stack:
             self.update_printable_maze()
@@ -228,6 +372,14 @@ class Maze:
                 stack.pop()
 
     def prims(self) -> None:
+        """
+        Generate the maze using a weighted variant of Prim's algorithm.
+        Candidate cells are stored in a queue. At each iteration, a cell is
+        selected randomly with a weight proportional to the square of its
+        Manhattan distance from the starting point. Walls toward all unvisited
+        neighbors are removed, and those neighbors are added to the queue.
+        The maze is rendered at every iteration via ``draw_a_maze``.
+        """
         start = (0, 0)
         queue = [(0, 0)]
         while queue:
@@ -241,8 +393,6 @@ class Maze:
             weight.extend(
                 [abs_dist(start, pos) for pos in queue if pos != start]
             )
-            # a = max(weight)
-            # weight = [a - b + 1 for b in weight]
             weight = [b**2 for b in weight]
             current = random.choices(population=queue, weights=weight)[0]
             dir_possible = [
@@ -261,7 +411,6 @@ class Maze:
             ]
             if dir_possible:
                 for goal in dir_possible:
-                    # goal = random.choice(dir_possible)
                     self.maze[current[0]][current[1]] &= ~goal.value
                     next_pos = add_pos(current, goal.delta())
                     self.maze[next_pos[0]][next_pos[1]] &= ~goal.oppo().value
@@ -270,6 +419,18 @@ class Maze:
                 queue.remove(current)
 
     def draw_in_folders(self) -> None:
+        """
+        Save the maze to the file specified by ``self.folders``.
+        The file is written in text mode. Each cell is represented by its
+        uppercase hexadecimal value, or by 'F' if its value exceeds 15
+        (special/logo cell). The entrance and exit coordinates are written
+        at the end of the file, comma-separated.
+        Output format:
+            - One line per row of cells.
+            - A blank separator line.
+            - ``enter_x,enter_y``
+            - ``exit_x,exit_y``
+        """
         with open(self.folders, "w") as fd:
             for y in range(self.size[1]):
                 for x in range(self.size[0]):
@@ -284,6 +445,13 @@ class Maze:
             print(f"{self.exit[0]},{self.exit[1]}", file=fd)
 
     def make_it_false(self) -> None:
+        """
+        Randomly break extra walls to create multiple paths in the maze,
+        making it an imperfect maze.
+        The number of walls to break is drawn randomly between ``len(self.maze)``
+        and ``len(self.maze) * 2``. Special cells (value > 15) are skipped.
+        The maze is rendered at every iteration via ``draw_a_maze``.
+        """
         break_wall = random.randint(len(self.maze), len(self.maze) * 2)
 
         while break_wall != 0:
@@ -319,6 +487,15 @@ class Maze:
             break_wall -= 1
 
     def logo42(self) -> None:
+        """
+        Place the 42 logo (small or large) at the center of the maze.
+
+        If the maze is too small (width < 11 and height < 12), the small logo
+        (value 16) is placed. Otherwise, the large logo (values 17-34) is
+        placed centered in the grid. If any large logo cell overlaps the
+        entrance or exit, the method falls back to the small logo, shifting
+        it by one cell if the center position itself conflicts.
+        """
         if self.size[0] < 11 and self.size[1] < 12:
             pos42 = (self.size[0] // 2, self.size[1] // 2)
             if (pos42 == self.enter) or (pos42 == self.exit):

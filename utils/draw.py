@@ -20,7 +20,24 @@ maze_save: list[Wall] | None = None
 
 
 class Presentation:
+    """
+    Main controller for rendering and interacting with the maze in the terminal.
+
+    Handles:
+    - Maze generation and drawing
+    - User input (keyboard controls)
+    - Theme switching
+    - Display of UI blocks (info, controls, logos)
+    """
+
     def __init__(self, config: "BaseConfig", player: "Player") -> None:
+        """
+        Initialize the presentation system.
+
+        Args:
+            config: Configuration object for the maze.
+            player: Player instance used for positioning and display.
+        """
         from maze.maker import Maze, THEMES
 
         self.themes = THEMES
@@ -47,11 +64,22 @@ class Presentation:
         self.start()
 
     def start(self) -> None:
+        """
+        Display the initial screen and validate terminal size.
+
+        Waits for user interaction before continuing.
+        Allows theme switching and dynamically refreshes the display.
+        """
 
         lines = (self.maze.size[0] * 3) + 10
         columns = (self.maze.size[1] * 8) + 50
 
         def good_size(line: int, columns: int) -> list[str]:
+            """
+            Check if the terminal size is sufficient.
+
+            Returns colored values depending on whether the size fits.
+            """
             if line >= self.scren_size.lines:
                 str_line = color(f"{line}", 255, 0, 0)
             else:
@@ -111,6 +139,16 @@ class Presentation:
                     print(e.wall())
 
     def loop(self) -> None:
+        """
+        Main interaction loop.
+
+        Handles:
+        - Maze generation (different algorithms)
+        - Theme switching
+        - Perfect mode toggling
+        - Maze solving visualization
+        - Redrawing UI elements
+        """
         global maze_save
         set_perfect_mode = self.config.PERFECT
         secondbloc = moveblock((30, 1))
@@ -179,11 +217,11 @@ class Presentation:
             if key == "l":
                 from maze.solver import Solver
                 from utils.path_display import PathDrawer
+
                 solve = Solver(self.maze.maze, self.config)
                 self.path = solve.solve_maze()
                 pathdraw = PathDrawer(self.path)
                 pathdraw.path_draw(offset_line=25, offset_col=15)
-
 
             if key:
                 print(
@@ -195,6 +233,9 @@ class Presentation:
                 move_cursor_to_bottom()
 
     def change_theme(self) -> None:
+        """
+        Cycle through available themes and apply the next one.
+        """
         flag = False
         for e in self.themes:
             if flag:
@@ -205,17 +246,41 @@ class Presentation:
         self.maze.change_theme(list(self.themes.keys())[0])
 
     def pressentation_enter(self) -> None:
+        """
+        Placeholder for future feature related to enter key handling.
+        """
         pass
 
 
 class InfoBlock:
+    """
+    Display block showing configuration and runtime information.
+    """
+
     WIDTH = 32
 
     def __init__(self, config: "BaseConfig", pos: tuple[int, int]) -> None:
+        """
+        Initialize the info block.
+
+        Args:
+            config: Configuration object.
+            pos: Cursor position where the block should be rendered.
+        """
         self.pos = pos
         self.config = config
 
     def block(self, theme: str, perfect: bool) -> str:
+        """
+        Build the formatted information block.
+
+        Args:
+            theme: Current theme name.
+            perfect: Whether perfect maze mode is enabled.
+
+        Returns:
+            A formatted string ready to be printed.
+        """
         size = os.get_terminal_size()
         w = self.WIDTH
 
@@ -224,6 +289,9 @@ class InfoBlock:
 
         # ██ ▄▄ ▀▀
         def line(content: str) -> str:
+            """
+            Format a single line with padding, ignoring ANSI codes length.
+            """
             import re
 
             clean = re.sub(r"\x1b\[[0-9;]*m", "", content)
@@ -259,12 +327,34 @@ class InfoBlock:
 
 
 class moveblock:
+    """
+    Display block showing available controls and actions.
+
+    This block presents keyboard shortcuts to interact with the maze,
+    such as quitting, changing theme, toggling modes, and generating mazes.
+    """
+
     WIDTH = 32
 
     def __init__(self, pos: tuple[int, int]) -> None:
+        """
+        Initialize the control block.
+
+        Args:
+            pos: Cursor position where the block should be rendered.
+        """
         self.pos = pos
 
     def block(self, perfectmod: bool) -> str:
+        """
+        Build the formatted control/help block.
+
+        Args:
+            perfectmod: Current state of the perfect mode.
+
+        Returns:
+            A formatted string ready to be printed.
+        """
         w = self.WIDTH
 
         border_top = "█" + "▀" * w + "█"
@@ -276,6 +366,9 @@ class moveblock:
 
         # ██ ▄▄ ▀▀
         def line(content: str) -> str:
+            """
+            Format a single line with padding, ignoring ANSI escape sequences.
+            """
             import re
 
             clean = re.sub(r"\x1b\[[0-9;]*m", "", content)
@@ -311,6 +404,17 @@ def draw_a_maze(
     backcolor: tuple[int, int, int],
     wallcolor: tuple[int, int, int],
 ) -> None:
+    """
+    Render the maze in the terminal with color optimization.
+
+    Only updates tiles that have changed compared to the previous frame,
+    improving performance and reducing flickering.
+
+    Args:
+        maze: List of Wall objects representing the maze.
+        backcolor: RGB tuple for background color.
+        wallcolor: RGB tuple for wall color.
+    """
     global maze_save
     r = 0
     g = 1
@@ -356,10 +460,26 @@ def draw_a_maze(
 
 
 class otter(Wall):
+    """
+    Decorative ASCII art element representing an otter.
+    """
+
     def __init__(self, pos: tuple[int, int]):
+        """
+        Initialize the otter at a given position.
+
+        Args:
+            pos: Cursor position for rendering.
+        """
         super().__init__(pos)
 
     def wall(self) -> str:
+        """
+        Return the ASCII art of the otter positioned in the terminal.
+
+        Returns:
+            A formatted string ready to be printed.
+        """
         return cursor_more_line(
             self.pos,
             [
@@ -381,10 +501,26 @@ class otter(Wall):
 
 
 class red_panda(Wall):
+    """
+    Decorative ASCII art element representing a red panda.
+    """
+
     def __init__(self, pos: tuple[int, int]):
+        """
+        Initialize the red panda at a given position.
+
+        Args:
+            pos: Cursor position for rendering.
+        """
         super().__init__(pos)
 
     def wall(self) -> str:
+        """
+        Return the ASCII art of the red panda with applied color.
+
+        Returns:
+            A formatted string ready to be printed.
+        """
         panda = cursor_more_line(
             self.pos,
             [
@@ -417,6 +553,12 @@ class red_panda(Wall):
 
 
 def logo_amazing() -> list[str]:
+    """
+    Return the ASCII art lines for the 'Amazing' logo.
+
+    Returns:
+        A list of strings representing the logo.
+    """
     return [
         " _______        ___ ___                          ___             ",
         "|       |______|   Y   .---.-.-----.-----.______|   .-----.-----.",
@@ -429,16 +571,34 @@ def logo_amazing() -> list[str]:
 
 
 class amazing(Wall):
+    """
+    Decorative ASCII art element displaying the 'Amazing' logo.
+    """
+
     def __init__(self, pos: tuple[int, int]) -> None:
+        """
+        Initialize the logo at a given position.
+
+        Args:
+            pos: Cursor position for rendering.
+        """
         super().__init__(pos)
 
     def resise(self, x: int, y: int) -> None:
+        """
+        Update the position of the logo.
+
+        Args:
+            x: New row position.
+            y: New column position.
+        """
         self.pos = (x, y)
 
     def wall(self) -> str:
-        return cursor_more_line(
-            self.pos,
-            logo_amazing(),
-        )
+        """
+        Return the ASCII logo positioned in the terminal.
 
-
+        Returns:
+            A formatted string ready to be printed.
+        """
+        return cursor_more_line(self.pos, logo_amazing())

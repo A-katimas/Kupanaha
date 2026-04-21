@@ -20,6 +20,19 @@ except FileNotFoundError as e:
 
 
 def main() -> None:
+    """
+    Entry point of the application.
+
+    This function:
+    - Validates command-line arguments
+    - Loads and parses the configuration file
+    - Initializes the random seed
+    - Creates the player instance
+    - Starts the presentation loop
+
+    If an error occurs during execution, it is displayed at the bottom
+    of the terminal.
+    """
     if len(sys.argv) < 2:
         print(
             color(
@@ -31,23 +44,29 @@ def main() -> None:
             )
         )
         sys.exit(1)
+
     config = parth(sys.argv[1])
+
     if config is not None:
         clear()
         random.seed(config.SEED)
+
         player = Player([config.ENTRY[0], config.ENTRY[1]], "🦦")
+
         try:
             press = Presentation(config, player)
-
             press.loop()
         except ValueError as e:
             move_cursor_to_bottom()
             print(e)
-    # player.print_self()
-
-    # move_cursor_to_bottom()
 
 
 if __name__ == "__main__":
+    """
+    Script execution guard.
+
+    Ensures that the program only runs if the required configuration
+    file exists.
+    """
     if folders_exist:
         main()

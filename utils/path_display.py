@@ -2,7 +2,7 @@ from utils.draw import Wall, cursor, color
 from utils import cursor
 
 
-class PathDrawer():
+class PathDrawer:
     def __init__(self, path: list[tuple[int, int]]):
         self.path = path
 

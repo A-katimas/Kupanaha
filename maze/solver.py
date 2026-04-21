@@ -49,7 +49,7 @@ class Solver:
             for dir in Direction:  # Parcourt les quatre directions possibles
                 cell = self.maze[x][y]  # valeur binaire de la cas actuelle(mur ou pas)
                 dx, dy = dir.delta()  # deplacement selon la direction (ex: 0,1 pour droite)
-                nx, ny = x + dx, y + dy  # coordonnées de la case voisine 
+                nx, ny = x + dx, y + dy  # coordonnées de la case voisine
                 if 0 <= nx < len(self.maze) and 0 <= ny < len(self.maze[0]):
                     if (nx, ny) not in visited:
                         if not cell & dir.value:  # verifie si le mur est fermé dans la direction actuelle
