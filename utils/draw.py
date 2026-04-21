@@ -1,4 +1,3 @@
-from tracemalloc import start
 from typing import TYPE_CHECKING
 
 
@@ -21,7 +20,8 @@ maze_save: list[Wall] | None = None
 
 class Presentation:
     """
-    Main controller for rendering and interacting with the maze in the terminal.
+    Main controller for rendering and interacting with the maze in the
+    terminal.
 
     Handles:
     - Maze generation and drawing

@@ -6,7 +6,8 @@ def color(text: str | int | None, r: int, g: int, b: int) -> str:
     in the specified RGB color in the terminal.
 
     Args:
-        text: The text (or value) to color. If not a string, it will be converted.
+        text: The text (or value) to color. If not a string, it will be
+        converted.
         r: Red component (0–255).
         g: Green component (0–255).
         b: Blue component (0–255).
@@ -27,7 +28,8 @@ def bg_color(text: str | int, r: int, g: int, b: int) -> str:
     with the specified RGB background color in the terminal.
 
     Args:
-        text: The text (or value) to display. If not a string, it will be converted.
+        text: The text (or value) to display. If not a string, it will be
+        converted.
         r: Red component (0–255).
         g: Green component (0–255).
         b: Blue component (0–255).

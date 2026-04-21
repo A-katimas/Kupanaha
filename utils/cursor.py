@@ -13,7 +13,8 @@ def cursor(pos: tuple[int, int], text: str) -> str:
         text: The text to display at the given position.
 
     Returns:
-        A string containing ANSI escape codes to position the cursor and print the text.
+        A string containing ANSI escape codes to position the cursor and
+        print the text.
     """
     return f"\033[{pos[0]};{pos[1]}H{text}"
 
@@ -69,7 +70,8 @@ def clear() -> None:
     """
     Clear the terminal screen and reset the cursor position.
 
-    Sends ANSI escape sequences to clear the screen and move the cursor to (0, 0).
+    Sends ANSI escape sequences to clear the screen and move the cursor to
+    (0, 0).
     """
     print("\033[2J")
     print("\033[H")
@@ -79,10 +81,12 @@ def get_key() -> str:
     """
     Read a single key press from standard input (raw mode).
 
-    Supports special keys such as arrow keys, which emit multi-character sequences.
+    Supports special keys such as arrow keys, which emit multi-character
+    sequences.
 
     Returns:
-        The key pressed as a string. Special keys may return multiple characters.
+        The key pressed as a string. Special keys may return multiple
+        characters.
     """
     fd = sys.stdin.fileno()
     old = termios.tcgetattr(fd)

@@ -105,7 +105,8 @@ class Direction(Enum):
         Return the opposite direction.
 
         Returns:
-            Direction: The direction opposite to the current one (N<->S, E<->W).
+            Direction: The direction opposite to the current one
+            (N<->S, E<->W).
         """
         return {
             Direction.DIR_N: Direction.DIR_S,
@@ -148,7 +149,8 @@ class Maze:
         exit (tuple[int, int]): Position of the maze exit.
         backcolor (list[int]): Background color as [R, G, B].
         wallcolor (list[int]): Wall color as [R, G, B].
-        start_print (list[int]): Pixel coordinates for the top-left rendering origin.
+        start_print (list[int]): Pixel coordinates for the top-left rendering
+        origin.
         maze (list[Any]): Internal 2D grid of the maze.
         folders (str): File path used to save the maze.
         printable_maze (list): List of wall tile objects ready for rendering.
@@ -171,8 +173,10 @@ class Maze:
             size (tuple[int, int]): Dimensions of the maze (width, height).
             Enter (tuple[int, int]): Entrance position (column, row).
             Exit (tuple[int, int]): Exit position (column, row).
-            start_print (list[int]): Pixel coordinates for the rendering origin.
-            theme (str): Name of the color theme to apply (must exist in THEMES).
+            start_print (list[int]): Pixel coordinates for the rendering
+            origin.
+            theme (str): Name of the color theme to apply
+            (must exist in THEMES).
             folders (str): File path for saving the maze.
         """
         self.size = size
@@ -448,7 +452,8 @@ class Maze:
         """
         Randomly break extra walls to create multiple paths in the maze,
         making it an imperfect maze.
-        The number of walls to break is drawn randomly between ``len(self.maze)``
+        The number of walls to break is drawn randomly between
+        ``len(self.maze)``
         and ``len(self.maze) * 2``. Special cells (value > 15) are skipped.
         The maze is rendered at every iteration via ``draw_a_maze``.
         """

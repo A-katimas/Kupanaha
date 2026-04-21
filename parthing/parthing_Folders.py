@@ -18,7 +18,8 @@ class BaseConfig(BaseModel):
     Configuration model for maze generation.
 
     This class validates and stores all parameters required to generate a maze,
-    including dimensions, entry/exit points, algorithm selection, and output options.
+    including dimensions, entry/exit points, algorithm selection, and output
+    options.
     """
 
     WIDTH: int = Field(..., ge=2)
@@ -49,7 +50,8 @@ class BaseConfig(BaseModel):
             A tuple of two integers.
 
         Raises:
-            ValueError: If the format is invalid or values are not valid integers.
+            ValueError: If the format is invalid or values are not valid
+            integers.
         """
         if isinstance(value, str):
             parts = value.split(",")
@@ -135,7 +137,8 @@ def parth_file_path(file_path: str) -> dict[str, Any] | None:
         file_path: Path to the configuration file.
 
     Returns:
-        A dictionary containing configuration values, or None if an error occurs.
+        A dictionary containing configuration values, or None if an error
+        occurs.
 
     Raises:
         ValueError: If the file format is invalid or required keys are missing.
@@ -186,7 +189,8 @@ def parth(file_path: str) -> BaseConfig | None:
         A validated BaseConfig instance, or None if an error occurs.
 
     Raises:
-        ValidationError: If the configuration does not satisfy BaseConfig constraints.
+        ValidationError: If the configuration does not satisfy BaseConfig
+        constraints.
         KeyError: If THEME or ALGO is not recognized.
     """
     config_dict = parth_file_path(file_path)
