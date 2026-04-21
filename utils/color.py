@@ -35,7 +35,8 @@ def bg_color(text: str | int, r: int, g: int, b: int) -> str:
         b: Blue component (0–255).
 
     Returns:
-        A string formatted with ANSI escape codes for background-colored output.
+        A string formatted with ANSI escape codes for background-colored
+        output.
     """
     if isinstance(text, str):
         return f"\033[48;2;{r};{g};{b}m{str(text)}\033[0m"

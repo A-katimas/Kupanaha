@@ -1,8 +1,7 @@
 import utils.wall as wall
-from utils import draw_a_maze
 import random
 from enum import Enum
-from typing import Callable, Any
+from typing import Callable, Any, Generator
 
 THEMES = {
     "white": [[245, 245, 245], [80, 80, 80]],
@@ -317,6 +316,7 @@ class Maze:
             list[str]: The generated maze grid.
         """
         self.maze = self.generate_maze()
+        self.update_printable_maze()
         return self.maze
 
     def generate_maze(self) -> list[str]:
@@ -333,7 +333,7 @@ class Maze:
         self.logo42()
         return self.maze
 
-    def backtrack(self) -> None:
+    def backtrack(self) -> Generator[None, None, None]:
         """
         Generate the maze using an iterative recursive backtracking algorithm
         (depth-first search with an explicit stack).
@@ -345,12 +345,6 @@ class Maze:
         """
         stack = [(0, 0)]
         while stack:
-            self.update_printable_maze()
-            draw_a_maze(
-                self.printable_maze,
-                self.get_tuple_theme()[0],
-                self.get_tuple_theme()[1],
-            )
             current = stack[-1]
             dir_possible = [
                 direct
@@ -372,10 +366,13 @@ class Maze:
                 next_pos = add_pos(current, goal.delta())
                 self.maze[next_pos[0]][next_pos[1]] &= ~goal.oppo().value
                 stack.append(next_pos)
+                self.update_printable_maze()
+                yield None
             else:
                 stack.pop()
+        self.update_printable_maze()
 
-    def prims(self) -> None:
+    def prims(self) -> Generator[None, None, None]:
         """
         Generate the maze using a weighted variant of Prim's algorithm.
         Candidate cells are stored in a queue. At each iteration, a cell is
@@ -388,16 +385,11 @@ class Maze:
         queue = [(0, 0)]
         while queue:
             self.update_printable_maze()
-            draw_a_maze(
-                self.printable_maze,
-                self.get_tuple_theme()[0],
-                self.get_tuple_theme()[1],
-            )
             weight = [1] if start in queue else []
             weight.extend(
                 [abs_dist(start, pos) for pos in queue if pos != start]
             )
-            weight = [b**2 for b in weight]
+            weight = [b**5 for b in weight]
             current = random.choices(population=queue, weights=weight)[0]
             dir_possible = [
                 direct
@@ -419,6 +411,8 @@ class Maze:
                     next_pos = add_pos(current, goal.delta())
                     self.maze[next_pos[0]][next_pos[1]] &= ~goal.oppo().value
                     queue.append(next_pos)
+                    self.update_printable_maze()
+                    yield None
             else:
                 queue.remove(current)
 
@@ -448,7 +442,7 @@ class Maze:
             print(f"{self.enter[0]},{self.enter[1]}", file=fd)
             print(f"{self.exit[0]},{self.exit[1]}", file=fd)
 
-    def make_it_false(self) -> None:
+    def make_it_false(self) -> Generator[None, None, None]:
         """
         Randomly break extra walls to create multiple paths in the maze,
         making it an imperfect maze.
@@ -461,11 +455,6 @@ class Maze:
 
         while break_wall != 0:
             self.update_printable_maze()
-            draw_a_maze(
-                self.printable_maze,
-                self.get_tuple_theme()[0],
-                self.get_tuple_theme()[1],
-            )
             rand_x = random.randint(0, self.size[0] - 1)
             rand_y = random.randint(0, self.size[1] - 1)
             current = (rand_x, rand_y)
@@ -488,6 +477,8 @@ class Maze:
 
             self.maze[current[0]][current[1]] &= ~goal.value
             self.maze[next_pos[0]][next_pos[1]] &= ~goal.oppo().value
+            self.update_printable_maze()
+            yield None
 
             break_wall -= 1
 

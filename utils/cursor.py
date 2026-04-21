@@ -2,6 +2,7 @@ import os
 import sys
 import tty
 import termios
+import select
 
 
 def cursor(pos: tuple[int, int], text: str) -> str:
@@ -88,18 +89,19 @@ def get_key() -> str:
         The key pressed as a string. Special keys may return multiple
         characters.
     """
+
     fd = sys.stdin.fileno()
     old = termios.tcgetattr(fd)
 
+    sys.stdin.buffer.raw
     try:
         tty.setraw(fd)
-        key = sys.stdin.read(1)
-
+        if not select.select([fd], [], [], 0)[0]:
+            return ""
+        key = os.read(fd, 1)
         # Special keys (like arrows) send multiple characters
-        if key == "\x1b":
-            key += sys.stdin.read(2)
-
+        if key == b"\x1b":
+            key += os.read(fd, 2)
+        return key.decode()
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old)
-
-    return key

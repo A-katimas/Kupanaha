@@ -1,15 +1,15 @@
-from typing import TYPE_CHECKING
-
-
+from typing import TYPE_CHECKING, Callable, Generator
+import re
+import random
 from .wall import Wall
 from .color import color, bg_color
 from .cursor import get_key, clear, move_cursor_to_bottom
 
 
-# from .player import get_key
 from .cursor import cursor_more_line, cursor
 
 import os
+
 
 if TYPE_CHECKING:
     from utils import Player
@@ -40,6 +40,7 @@ class Presentation:
         """
         from maze.maker import Maze, THEMES
 
+        self.generator: Generator = None
         self.themes = THEMES
         self.scren_size = os.get_terminal_size()
         self.config = config
@@ -61,6 +62,8 @@ class Presentation:
             amazing((1, 40)),
             red_panda((1, self.scren_size.columns - 45)),
         ]
+        self.print_modifier = []
+        self.itsfalse: bool
         self.start()
 
     def start(self) -> None:
@@ -108,7 +111,10 @@ class Presentation:
             print(e.wall())
 
         while True:
-            key = get_key()
+            # key = get_key()
+            while not (key := get_key()):
+                pass
+            print(f"key, T{key}T")
             if key == "\r" and not (
                 self.scren_size.lines <= lines
                 and self.scren_size.columns <= columns
@@ -165,56 +171,83 @@ class Presentation:
         }
         algo = tile_algo.get(self.config.ALGO)
         if algo:
-            algo()
-        if not self.config.PERFECT:
-            self.maze.make_it_false()
-        self.maze.draw_in_folders()
+            self.generator = algo()
+        self.set_perfect_mode = self.config.PERFECT
         while True:
+            if maze_save is None:
+                draw_a_maze(
+                    self.maze.printable_maze,
+                    self.maze.get_tuple_theme()[0],
+                    self.maze.get_tuple_theme()[1],
+                    self.print_modifier,
+                )
+            try:
+                if self.generator is not None:
+                    next(self.generator)
+                    draw_a_maze(
+                        self.maze.printable_maze,
+                        self.maze.get_tuple_theme()[0],
+                        self.maze.get_tuple_theme()[1],
+                        self.print_modifier,
+                    )
+            except StopIteration:
+                if (
+                    not set_perfect_mode
+                    and self.generator.gi_code
+                    is not self.maze.make_it_false.__code__
+                ):
+                    self.generator = self.maze.make_it_false()
+                else:
+                    self.generator = None
+                draw_a_maze(
+                    self.maze.printable_maze,
+                    self.maze.get_tuple_theme()[0],
+                    self.maze.get_tuple_theme()[1],
+                    self.print_modifier,
+                )
+                self.maze.draw_in_folders()
             key = get_key()
             if key == "q":
                 raise ValueError("Good Bey")
             if key == "c":
                 self.change_theme()
-                tup_theme = self.maze.get_tuple_theme()
                 maze_save = None
                 draw_a_maze(
-                    self.maze.printable_maze, tup_theme[0], tup_theme[1]
+                    self.maze.printable_maze,
+                    self.maze.get_tuple_theme()[0],
+                    self.maze.get_tuple_theme()[1],
+                    self.print_modifier,
                 )
             if key == "b":
                 self.maze.make_a_maze()
-                maze_save = None
-                draw_a_maze(
-                    self.maze.printable_maze,
-                    self.maze.get_tuple_theme()[0],
-                    self.maze.get_tuple_theme()[1],
-                )
-                maze_save = None
-                self.maze.backtrack()
-                if not set_perfect_mode:
-                    self.maze.make_it_false()
-                self.maze.draw_in_folders()
-
-            if key == "i":
+                self.generator = self.maze.backtrack()
+            elif key == "i":
                 self.maze.make_a_maze()
-                maze_save = None
-                draw_a_maze(
-                    self.maze.printable_maze,
-                    self.maze.get_tuple_theme()[0],
-                    self.maze.get_tuple_theme()[1],
-                )
-                maze_save = None
-                self.maze.prims()
-                if not set_perfect_mode:
-                    self.maze.make_it_false()
-                self.maze.draw_in_folders()
-
-            if key == "p":
+                self.generator = self.maze.prims()
+            elif key == "p":
                 if set_perfect_mode:
                     set_perfect_mode = False
                 else:
                     set_perfect_mode = True
-
-            if key == "l":
+            elif key == "h":
+                if self.hack in self.print_modifier:
+                    self.print_modifier.remove(self.hack)
+                else:
+                    self.print_modifier.append(self.hack)
+                maze_save = None
+            elif key == "r":
+                if self.inverse in self.print_modifier:
+                    self.print_modifier.remove(self.inverse)
+                else:
+                    self.print_modifier.append(self.inverse)
+                maze_save = None
+            elif key == "o":
+                if self.otter_maker in self.print_modifier:
+                    self.print_modifier.remove(self.otter_maker)
+                else:
+                    self.print_modifier.append(self.otter_maker)
+                maze_save = None
+            elif key == "l":
                 from maze.solver import Solver
                 from utils.path_display import PathDrawer
 
@@ -230,7 +263,6 @@ class Presentation:
                     )
                 )
                 print(secondbloc.block(set_perfect_mode))
-                move_cursor_to_bottom()
 
     def change_theme(self) -> None:
         """
@@ -250,6 +282,21 @@ class Presentation:
         Placeholder for future feature related to enter key handling.
         """
         pass
+
+    def inverse(self, wall: str) -> str:
+        return wall.translate(
+            str.maketrans({" ": "█", "█": " ", "▄": "▀", "▀": "▄"})
+        )
+
+    def hack(self, wall: str) -> str:
+        return re.sub(
+            r"[█▄▀]",
+            lambda a: chr(random.randrange(32, 127)),
+            wall,
+        )
+
+    def otter_maker(self, wall: str) -> str:
+        return wall.replace("██", "🦦")
 
 
 class InfoBlock:
@@ -403,6 +450,7 @@ def draw_a_maze(
     maze: list[Wall],
     backcolor: tuple[int, int, int],
     wallcolor: tuple[int, int, int],
+    effect: list[Callable] = None,
 ) -> None:
     """
     Render the maze in the terminal with color optimization.
@@ -419,29 +467,43 @@ def draw_a_maze(
     r = 0
     g = 1
     b = 2
+    changed_list = (
+        [
+            cell
+            for cell, old in zip(maze, maze_save)
+            if cell.__class__ != old.__class__
+        ]
+        if maze_save is not None
+        else maze
+    )
 
-    for i in range(len(maze)):
-        if maze_save is None or maze[i] is not maze_save[i]:
-            print(
-                bg_color(
-                    color(
-                        maze[i].wall(),
-                        backcolor[r],
-                        backcolor[g],
-                        backcolor[b],
-                    ),
-                    wallcolor[r],
-                    wallcolor[g],
-                    wallcolor[b],
+    for changed in changed_list:
+        # if effect:
+        #     print(f"printing wall at {i}")
+        wall = changed.wall()
+        for func in effect:
+            wall = func(wall)
+        print(
+            bg_color(
+                color(
+                    wall,
+                    backcolor[r],
+                    backcolor[g],
+                    backcolor[b],
                 ),
-                end="",
-            )
-            if maze[i].exit is True:
-                print(color(maze[i].enter_or_exit(), 50, 200, 50))
-            if maze[i].entre is True:
-                print(color(maze[i].enter_or_exit(), 200, 100, 50))
-
-    maze_save = list(maze)
+                wallcolor[r],
+                wallcolor[g],
+                wallcolor[b],
+            ),
+            end="",
+            flush=True,
+        )
+        if changed.exit is True:
+            print(color(changed.enter_or_exit(), 50, 200, 50))
+        if changed.entre is True:
+            print(color(changed.enter_or_exit(), 200, 100, 50))
+    move_cursor_to_bottom()
+    maze_save = maze
 
 
 # def debug_key():
