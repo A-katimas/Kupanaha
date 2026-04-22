@@ -367,7 +367,7 @@ class Maze:
                 self.maze[next_pos[0]][next_pos[1]] &= ~goal.oppo().value
                 stack.append(next_pos)
                 self.update_printable_maze()
-                yield None
+                yield
             else:
                 stack.pop()
         self.update_printable_maze()
@@ -412,7 +412,7 @@ class Maze:
                     self.maze[next_pos[0]][next_pos[1]] &= ~goal.oppo().value
                     queue.append(next_pos)
                     self.update_printable_maze()
-                    yield None
+                    yield
             else:
                 queue.remove(current)
 
@@ -478,7 +478,7 @@ class Maze:
             self.maze[current[0]][current[1]] &= ~goal.value
             self.maze[next_pos[0]][next_pos[1]] &= ~goal.oppo().value
             self.update_printable_maze()
-            yield None
+            yield
 
             break_wall -= 1
 

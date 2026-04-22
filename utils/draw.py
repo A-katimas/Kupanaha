@@ -1,10 +1,10 @@
-from typing import TYPE_CHECKING, Callable, Generator
+from typing import TYPE_CHECKING, Callable, Generator, Any
+from types import GeneratorType
 import re
 import random
 from .wall import Wall
 from .color import color, bg_color
 from .cursor import get_key, clear, move_cursor_to_bottom
-
 
 from .cursor import cursor_more_line, cursor
 
@@ -40,13 +40,13 @@ class Presentation:
         """
         from maze.maker import Maze, THEMES
 
-        self.generator: Generator = None
+        self.generator: Generator[None, None, None] | None = None
         self.themes = THEMES
         self.scren_size = os.get_terminal_size()
         self.config = config
         self.player = player
         self.info_block = InfoBlock(config, (15, 50))
-        self.path = []
+        self.path: list[Any] = []
         self.start_line = 0
         self.start_col = 0
         self.maze = Maze(
@@ -62,7 +62,7 @@ class Presentation:
             amazing((1, 40)),
             red_panda((1, self.scren_size.columns - 45)),
         ]
-        self.print_modifier = []
+        self.print_modifier: list[Callable[..., str]] = []
         self.itsfalse: bool
         self.start()
 
@@ -193,6 +193,7 @@ class Presentation:
             except StopIteration:
                 if (
                     not set_perfect_mode
+                    and isinstance(self.generator, GeneratorType)
                     and self.generator.gi_code
                     is not self.maze.make_it_false.__code__
                 ):
@@ -284,9 +285,13 @@ class Presentation:
         pass
 
     def inverse(self, wall: str) -> str:
-        return wall.translate(
-            str.maketrans({" ": "█", "█": " ", "▄": "▀", "▀": "▄"})
-        )
+        table: dict[int, str | int | None] = {
+            ord(" "): "█",
+            ord("█"): " ",
+            ord("▄"): "▀",
+            ord("▀"): "▄",
+        }
+        return wall.translate(str.maketrans(table))
 
     def hack(self, wall: str) -> str:
         return re.sub(
@@ -450,7 +455,7 @@ def draw_a_maze(
     maze: list[Wall],
     backcolor: tuple[int, int, int],
     wallcolor: tuple[int, int, int],
-    effect: list[Callable] = None,
+    effect: list[Callable[..., str]] | None = None,
 ) -> None:
     """
     Render the maze in the terminal with color optimization.
@@ -478,10 +483,8 @@ def draw_a_maze(
     )
 
     for changed in changed_list:
-        # if effect:
-        #     print(f"printing wall at {i}")
         wall = changed.wall()
-        for func in effect:
+        for func in effect or []:
             wall = func(wall)
         print(
             bg_color(

@@ -1,5 +1,4 @@
-from utils.draw import Wall, cursor, color
-from utils import cursor
+from utils.draw import cursor, color
 
 
 class PathDrawer:

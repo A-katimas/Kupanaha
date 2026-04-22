@@ -93,7 +93,6 @@ def get_key() -> str:
     fd = sys.stdin.fileno()
     old = termios.tcgetattr(fd)
 
-    sys.stdin.buffer.raw
     try:
         tty.setraw(fd)
         if not select.select([fd], [], [], 0)[0]:
