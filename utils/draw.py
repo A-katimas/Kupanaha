@@ -46,6 +46,7 @@ class Presentation:
         self.config = config
         self.player = player
         self.info_block = InfoBlock(config, (15, 50))
+        self.secondbloc = moveblock((30, 1))
         self.path: list[Any] = []
         self.start_line = 0
         self.start_col = 0
@@ -57,6 +58,7 @@ class Presentation:
             config.THEME,
             config.OUTPUT_FILE,
         )
+        self.set_perfect_mode = self.config.PERFECT
         self.logo = [
             otter((1, 1)),
             amazing((1, 40)),
@@ -95,7 +97,7 @@ class Presentation:
 
         print(
             cursor(
-                (27, 50),
+                (30, 50),
                 "touch any key to see your screen",
             )
         )
@@ -114,25 +116,23 @@ class Presentation:
             # key = get_key()
             while not (key := get_key()):
                 pass
-            print(f"key, T{key}T")
             if key == "\r" and not (
                 self.scren_size.lines <= lines
                 and self.scren_size.columns <= columns
             ):
                 break
-            if key == "q":
-                raise ValueError("Good Bey")
-            if key == "c":
-                self.change_theme()
-            if key:
+
+            self.key_handler(key, False)
+            if not key == "":
                 self.scren_size = os.get_terminal_size()
                 clear()
                 print(cursor((27, 50), "touch any key to see your screen"))
                 print(
                     self.info_block.block(
-                        self.maze.get_theme_name(), self.config.PERFECT
+                        self.maze.get_theme_name(), self.set_perfect_mode
                     )
                 )
+
                 have = good_size(lines, columns)
                 print(
                     cursor(
@@ -143,6 +143,12 @@ class Presentation:
 
                 for e in self.logo:
                     print(e.wall())
+                print(
+                    cursor(
+                        (30, 50),
+                        "touch any key to see your screen",
+                    )
+                )
 
     def loop(self) -> None:
         """
@@ -155,24 +161,9 @@ class Presentation:
         - Maze solving visualization
         - Redrawing UI elements
         """
-        global maze_save
-        set_perfect_mode = self.config.PERFECT
-        secondbloc = moveblock((30, 1))
+
         self.info_block.pos = ((14), (1))
-        print(
-            self.info_block.block(self.maze.get_theme_name(), set_perfect_mode)
-        )
-        print(secondbloc.block(set_perfect_mode))
-        tile_algo = {
-            "prims": self.maze.prims,
-            "Prims": self.maze.prims,
-            "backtrack": self.maze.backtrack,
-            "BackTrack": self.maze.backtrack,
-        }
-        algo = tile_algo.get(self.config.ALGO)
-        if algo:
-            self.generator = algo()
-        self.set_perfect_mode = self.config.PERFECT
+        self.startloop()
         while True:
             if maze_save is None:
                 draw_a_maze(
@@ -192,7 +183,7 @@ class Presentation:
                     )
             except StopIteration:
                 if (
-                    not set_perfect_mode
+                    not self.set_perfect_mode
                     and isinstance(self.generator, GeneratorType)
                     and self.generator.gi_code
                     is not self.maze.make_it_false.__code__
@@ -208,62 +199,91 @@ class Presentation:
                 )
                 self.maze.draw_in_folders()
             key = get_key()
-            if key == "q":
-                raise ValueError("Good Bey")
-            if key == "c":
-                self.change_theme()
-                maze_save = None
-                draw_a_maze(
-                    self.maze.printable_maze,
-                    self.maze.get_tuple_theme()[0],
-                    self.maze.get_tuple_theme()[1],
-                    self.print_modifier,
-                )
-            if key == "b":
-                self.maze.make_a_maze()
-                self.generator = self.maze.backtrack()
-            elif key == "i":
-                self.maze.make_a_maze()
-                self.generator = self.maze.prims()
-            elif key == "p":
-                if set_perfect_mode:
-                    set_perfect_mode = False
-                else:
-                    set_perfect_mode = True
-            elif key == "h":
-                if self.hack in self.print_modifier:
-                    self.print_modifier.remove(self.hack)
-                else:
-                    self.print_modifier.append(self.hack)
-                maze_save = None
-            elif key == "r":
-                if self.inverse in self.print_modifier:
-                    self.print_modifier.remove(self.inverse)
-                else:
-                    self.print_modifier.append(self.inverse)
-                maze_save = None
-            elif key == "o":
-                if self.otter_maker in self.print_modifier:
-                    self.print_modifier.remove(self.otter_maker)
-                else:
-                    self.print_modifier.append(self.otter_maker)
-                maze_save = None
-            elif key == "l":
-                from maze.solver import Solver
-                from utils.path_display import PathDrawer
-
-                solve = Solver(self.maze.maze, self.config)
-                self.path = solve.solve_maze()
-                pathdraw = PathDrawer(self.path)
-                pathdraw.path_draw(offset_line=25, offset_col=15)
-
+            self.key_handler(key, True)
             if key:
                 print(
                     self.info_block.block(
-                        self.maze.get_theme_name(), set_perfect_mode
+                        self.maze.get_theme_name(), self.set_perfect_mode
                     )
                 )
-                print(secondbloc.block(set_perfect_mode))
+                print(self.secondbloc.block(self.set_perfect_mode))
+
+    def startloop(self) -> None:
+        print(
+            self.info_block.block(
+                self.maze.get_theme_name(), self.set_perfect_mode
+            )
+        )
+        print(self.secondbloc.block(self.set_perfect_mode))
+        tile_algo = {
+            "prims": self.maze.prims,
+            "Prims": self.maze.prims,
+            "backtrack": self.maze.backtrack,
+            "BackTrack": self.maze.backtrack,
+        }
+        algo = tile_algo.get(self.config.ALGO)
+        if algo:
+            self.generator = algo()
+
+    def key_handler(self, key: str, onloop: bool) -> None:
+        global maze_save
+
+        if key == "q":
+            raise ValueError("Good Bey")
+
+        if key == "c" and onloop:
+            self.change_theme()
+            maze_save = None
+            draw_a_maze(
+                self.maze.printable_maze,
+                self.maze.get_tuple_theme()[0],
+                self.maze.get_tuple_theme()[1],
+                self.print_modifier,
+            )
+
+        if key == "b" and onloop:
+            self.maze.make_a_maze()
+
+            self.generator = self.maze.backtrack()
+        elif key == "i" and onloop:
+            self.maze.make_a_maze()
+            self.generator = self.maze.prims()
+
+        elif key == "p":
+            if self.set_perfect_mode:
+                self.set_perfect_mode = False
+            else:
+                self.set_perfect_mode = True
+
+        elif key == "h" and onloop:
+            if hack in self.print_modifier:
+                self.print_modifier.remove(hack)
+            else:
+                self.print_modifier.append(hack)
+            maze_save = None
+
+        elif key == "r" and onloop:
+            if inverse in self.print_modifier:
+                self.print_modifier.remove(inverse)
+            else:
+                self.print_modifier.append(inverse)
+            maze_save = None
+
+        elif key == "o" and onloop:
+            if otter_maker in self.print_modifier:
+                self.print_modifier.remove(otter_maker)
+            else:
+                self.print_modifier.append(otter_maker)
+            maze_save = None
+
+        elif key == "l" and onloop:
+            from maze.solver import Solver
+            from utils.path_display import PathDrawer
+
+            solve = Solver(self.maze.maze, self.config)
+            self.path = solve.solve_maze()
+            pathdraw = PathDrawer(self.path)
+            pathdraw.path_draw(offset_line=25, offset_col=15)
 
     def change_theme(self) -> None:
         """
@@ -284,24 +304,27 @@ class Presentation:
         """
         pass
 
-    def inverse(self, wall: str) -> str:
-        table: dict[int, str | int | None] = {
-            ord(" "): "█",
-            ord("█"): " ",
-            ord("▄"): "▀",
-            ord("▀"): "▄",
-        }
-        return wall.translate(str.maketrans(table))
 
-    def hack(self, wall: str) -> str:
-        return re.sub(
-            r"[█▄▀]",
-            lambda a: chr(random.randrange(32, 127)),
-            wall,
-        )
+def inverse(wall: str) -> str:
+    table: dict[int, str | int | None] = {
+        ord(" "): "█",
+        ord("█"): " ",
+        ord("▄"): "▀",
+        ord("▀"): "▄",
+    }
+    return wall.translate(str.maketrans(table))
 
-    def otter_maker(self, wall: str) -> str:
-        return wall.replace("██", "🦦")
+
+def hack(wall: str) -> str:
+    return re.sub(
+        r"[█▄▀]",
+        lambda a: chr(random.randrange(32, 127)),
+        wall,
+    )
+
+
+def otter_maker(wall: str) -> str:
+    return wall.replace("██", "🦦")
 
 
 class InfoBlock:
@@ -438,10 +461,10 @@ class moveblock:
             line(f"   -press '{color("p", 50, 200, 100)}' to change the "),
             line(f"     perfect mode on {color(perfectmod, 90, 160, 150)}"),
             line("        " + "─" * 15),
-            line(f"    -press '{color("i", 50, 200, 100)}' to generate"),
+            line(f"    -press '{color("b", 50, 200, 100)}' to generate"),
             line(f"         a {color("BackTrac", 100, 150, 160)}"),
             line("        " + "─" * 15),
-            line(f"    -press '{color("b", 50, 200, 100)}' to generate "),
+            line(f"    -press '{color("i", 50, 200, 100)}' to generate "),
             line(f"          a {color("Prims", 110, 140, 170)}"),
             line("        " + "─" * 15),
             line(f" -press '{color("l", 50, 200, 100)}' to see the solver "),
