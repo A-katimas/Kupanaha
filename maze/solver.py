@@ -98,11 +98,22 @@ class Solver:
         return path  # Retourner le chemin trouvé
 
 
-    def tuple_to_dir(dir : list[tuple[int, int]])-> list[str] :
+    def tuple_to_dir(path : list[tuple[int, int]])-> list[str] :
         result = []
-        save = dir [0]
-        for i in dir[:1] :
-            if i [0] 
+
+        for i in range(len(path)):
+            x1, y1 = path[i]
+            x2, y2 = path[i + 1]
+        
+        dx = x2 - x1 
+        dy = y2 - y1
+
+        
+
+
+    # il fau que je rajoute a la list de resultat 
+
+        return result
 
 """
     REPRÉSENTATION D'UNE CELLULE (Masquage Binaire)
