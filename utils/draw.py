@@ -113,7 +113,6 @@ class Presentation:
             print(e.wall())
 
         while True:
-            # key = get_key()
             while not (key := get_key()):
                 pass
             if key == "\r" and not (
@@ -227,6 +226,8 @@ class Presentation:
 
     def key_handler(self, key: str, onloop: bool) -> None:
         global maze_save
+        from utils.path_display import PathDrawer
+        from maze.solver import Solver
 
         if key == "q":
             raise ValueError("Good Bey")
@@ -277,13 +278,11 @@ class Presentation:
             maze_save = None
 
         elif key == "l" and onloop:
-            from maze.solver import Solver
-            from utils.path_display import PathDrawer
 
             solve = Solver(self.maze.maze, self.config)
             self.path = solve.solve_maze()
             pathdraw = PathDrawer(self.path)
-            pathdraw.path_draw(offset_line=25, offset_col=15)
+            pathdraw.path_draw(35, 12)
 
     def change_theme(self) -> None:
         """
@@ -522,7 +521,6 @@ def draw_a_maze(
                 wallcolor[b],
             ),
             end="",
-            flush=True,
         )
         if changed.exit is True:
             print(color(changed.enter_or_exit(), 50, 200, 50))
@@ -530,6 +528,7 @@ def draw_a_maze(
             print(color(changed.enter_or_exit(), 200, 100, 50))
     move_cursor_to_bottom()
     maze_save = maze
+    print(flush=True, end="")
 
 
 # def debug_key():

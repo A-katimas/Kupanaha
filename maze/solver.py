@@ -1,16 +1,11 @@
 # from pydantic import config
-
 from maze.maker import Direction
 
-# from utils.wall as wall
 from parthing import BaseConfig
 
-# from utils.color import bg_color
-# from utils.cursor import cursor
 from typing import Any
 
 # from utils.wall import Wall
-
 
 ###############################################################################
 #                                                                             #
@@ -102,6 +97,12 @@ class Solver:
 
         return path  # Retourner le chemin trouvé
 
+
+    def tuple_to_dir(dir : list[tuple[int, int]])-> list[str] :
+        result = []
+        save = dir [0]
+        for i in dir[:1] :
+            if i [0] 
 
 """
     REPRÉSENTATION D'UNE CELLULE (Masquage Binaire)
