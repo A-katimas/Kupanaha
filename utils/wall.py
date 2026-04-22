@@ -75,6 +75,23 @@ class S(Wall):
         )
 
 
+class path(Wall):
+    """Wall with a southern opening."""
+
+    def __init__(self, pos: tuple[int, int]):
+        super().__init__(pos)
+
+    def wall(self) -> str:
+        return cursor_more_line(
+            self.pos,
+            [
+                "      ",
+                "  ██  ",
+                "      ",
+            ],
+        )
+
+
 # ◢◣◤◥
 
 

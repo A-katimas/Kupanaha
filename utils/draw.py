@@ -41,13 +41,14 @@ class Presentation:
         from maze.maker import Maze, THEMES
 
         self.generator: Generator[None, None, None] | None = None
+        self.path = []
         self.themes = THEMES
         self.scren_size = os.get_terminal_size()
         self.config = config
         self.player = player
         self.info_block = InfoBlock(config, (15, 50))
         self.secondbloc = moveblock((30, 1))
-        self.path: list[Any] = []
+        self.path: list[str] = []
         self.start_line = 0
         self.start_col = 0
         self.maze = Maze(
@@ -169,6 +170,7 @@ class Presentation:
                     self.maze.printable_maze,
                     self.maze.get_tuple_theme()[0],
                     self.maze.get_tuple_theme()[1],
+                    self.path,
                     self.print_modifier,
                 )
             try:
@@ -178,6 +180,7 @@ class Presentation:
                         self.maze.printable_maze,
                         self.maze.get_tuple_theme()[0],
                         self.maze.get_tuple_theme()[1],
+                        self.path,
                         self.print_modifier,
                     )
             except StopIteration:
@@ -194,6 +197,7 @@ class Presentation:
                     self.maze.printable_maze,
                     self.maze.get_tuple_theme()[0],
                     self.maze.get_tuple_theme()[1],
+                    self.path,
                     self.print_modifier,
                 )
                 self.maze.draw_in_folders()
@@ -280,9 +284,12 @@ class Presentation:
         elif key == "l" and onloop:
 
             solve = Solver(self.maze.maze, self.config)
-            self.path = solve.solve_maze()
-            pathdraw = PathDrawer(self.path)
-            pathdraw.path_draw(35, 12)
+            self.solve, self.path = solve.solve_maze()
+            with open(f"{self.config.OUTPUT_FILE}", "a+") as output:
+                print("".join(self.solve), file=output)
+            maze_save = None
+            # pathdraw = PathDrawer(self.path)
+            # pathdraw.path_draw(35, 12)
 
     def change_theme(self) -> None:
         """
@@ -477,6 +484,7 @@ def draw_a_maze(
     maze: list[Wall],
     backcolor: tuple[int, int, int],
     wallcolor: tuple[int, int, int],
+    path_pos: list[tuple[int, int]] = [],
     effect: list[Callable[..., str]] | None = None,
 ) -> None:
     """
@@ -526,6 +534,8 @@ def draw_a_maze(
             print(color(changed.enter_or_exit(), 50, 200, 50))
         if changed.entre is True:
             print(color(changed.enter_or_exit(), 200, 100, 50))
+    for pos_x, pos_y in path_pos:
+        print(cursor((12 + (pos_y * 3) + 1, 35 + (pos_x * 6) + 2), "██"))
     move_cursor_to_bottom()
     maze_save = maze
     print(flush=True, end="")

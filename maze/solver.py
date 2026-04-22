@@ -28,7 +28,8 @@ class Solver:
         self.maze = maze
         self.config = config
 
-    def solve_maze(self) -> list[tuple[int, int]]:
+    def solve_maze(self) -> list[str]:
+
         queue = [
             self.config.ENTRY
         ]  # File d'attente pour l'exploration (FIFO), commence par l'entrée
@@ -39,7 +40,8 @@ class Solver:
             {}
         )  # came_from : Dictionnaire pour mémoriser le parent de chaque case
         # (clé=enfant, valeur=parent)
-        path = []  # Liste finale qui contiendra le chemin solution
+        path: list[tuple[int, int]] = []
+        # Liste finale qui contiendra le chemin solution
         step = (
             self.config.EXIT
         )  # Variable de suivi pour la reconstruction du chemin
@@ -49,71 +51,82 @@ class Solver:
                 0
             )  # Récupère la première case de la file d'attente pour l'explorer
             x, y = current
-
             if current == self.config.EXIT:
                 break
 
-            for dir in Direction:  # Parcourt les quatre directions possibles
-                cell = self.maze[x][
-                    y
-                ]  # valeur binaire de la cas actuelle(mur ou pas)
-                dx, dy = (
-                    dir.delta()
-                )  # deplacement selon la direction (ex: 0,1 pour droite)
+            for dir in Direction:
+                # Parcourt les quatre directions possibles
+                cell = self.maze[x][y]
+                # valeur binaire de la cas actuelle(mur ou pas)
+                dx, dy = dir.delta()
+                # deplacement selon la direction (ex: 0,1 pour droite)
                 nx, ny = x + dx, y + dy  # coordonnées de la case voisine
                 if 0 <= nx < len(self.maze) and 0 <= ny < len(self.maze[0]):
                     if (nx, ny) not in visited:
-                        if (
-                            not cell & dir.value
-                        ):  # verifie si le mur est fermé dans la direction
+                        if cell & dir.value:
+                            # verifie si le mur est fermé dans la direction
                             # actuelle
                             continue  # Si le mur est fermé, on ne peut pas
                         # aller dans cette direction
-                        if (
-                            cell & dir.value
-                        ):  # verifie si le mur est ouvert dans
-                            # la direction actuelle
-                            visited.add(
-                                (nx, ny)
-                            )  # marque la case voisine comme visitée
-                            # pour éviter de la revisiter
-                            came_from[(nx, ny)] = (
-                                x,
-                                y,
-                            )  # Ajouter à la file pour exploration future
-                            queue.append(
-                                (nx, ny)
-                            )  # Ajouter la case voisine à la file d'attente
-                            # pour l'explorer plus tard
+                        visited.add((nx, ny))
+                        came_from[(nx, ny)] = (x, y)
+                        queue.append((nx, ny))
+                        # if (
+                        #     cell & dir.value
+                        # ):  # verifie si le mur est ouvert dans
+                        #     # la direction actuelle
+                        #     visited.add(
+                        #         (nx, ny)
+                        #     )  # marque la case voisine comme visitée
+                        #     # pour éviter de la revisiter
+                        #     came_from[(nx, ny)] = (
+                        #         x,
+                        #         y,
+                        #     )  # Ajouter à la file pour exploration future
+                        #     queue.append(
+                        #         (nx, ny)
+                        #     )  # Ajouter la case voisine à la file d'attente
+                        #     # pour l'explorer plus tard
 
         while step != self.config.ENTRY:
-            if step not in came_from:
-                break
+            if self.config.EXIT not in came_from:
+                return []
             path.append(step)  # Ajouter la case actuelle au chemin
             step = came_from[step]  # Passer au parent de la case actuelle
-
-        path.reverse()  # Inverser le chemin pour qu'il aille de l'entrée à
+        path.append(self.config.ENTRY)
+        path.reverse()
+        # Inverser le chemin pour qu'il aille de l'entrée à
         # la sortie
 
-        return path  # Retourner le chemin trouvé
+        result = self.tuple_to_dir(path)
+        with open("restult.txt", "w+") as fd:
+            print(result, file=fd)
+        return (result, path)  # Retourner le chemin trouvé
 
+    def tuple_to_dir(self, path: list[tuple[int, int]]) -> list[str]:
+        """
+        Convert a list of positions into movement directions.
 
-    def tuple_to_dir(path : list[tuple[int, int]])-> list[str] :
+        Args:
+            path: List of (x, y) positions.
+
+        Returns:
+            A list of direction names corresponding to movements.
+        """
         result = []
 
-        for i in range(len(path)):
-            x1, y1 = path[i]
-            x2, y2 = path[i + 1]
-        
-        dx = x2 - x1 
-        dy = y2 - y1
+        for i in range(len(path) - 1):
+            dx = path[i + 1][0] - path[i][0]
+            dy = path[i + 1][1] - path[i][1]
 
-        
-
-
-    # il fau que je rajoute a la list de resultat 
+            for dir in Direction:
+                name, delta = dir.to_char(), dir.delta()
+                if (dx, dy) == delta:
+                    result.append(name)
+                    break
 
         return result
+
 
 """
     REPRÉSENTATION D'UNE CELLULE (Masquage Binaire)

@@ -132,6 +132,14 @@ class Direction(Enum):
             Direction.DIR_W: (-1, 0),
         }[self]
 
+    def to_char(self) -> str:
+        return {
+            Direction.DIR_N: "N",
+            Direction.DIR_E: "E",
+            Direction.DIR_S: "S",
+            Direction.DIR_W: "W",
+        }[self]
+
 
 class Maze:
     """
