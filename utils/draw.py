@@ -42,6 +42,7 @@ class Presentation:
 
         self.generator: Generator[None, None, None] | None = None
         self.path = []
+        self.solve = None
         self.themes = THEMES
         self.scren_size = os.get_terminal_size()
         self.config = config
@@ -247,11 +248,17 @@ class Presentation:
             )
 
         if key == "b" and onloop:
+            self.solve = None
+            self.path = []
             self.maze.make_a_maze()
-
             self.generator = self.maze.backtrack()
+
+
         elif key == "i" and onloop:
+            self.solve = None
+            self.path = []
             self.maze.make_a_maze()
+            self.generator = self.maze.backtrack()
             self.generator = self.maze.prims()
 
         elif key == "p":
@@ -282,7 +289,6 @@ class Presentation:
             maze_save = None
 
         elif key == "l" and onloop:
-
             solve = Solver(self.maze.maze, self.config)
             self.solve, self.path = solve.solve_maze()
             with open(f"{self.config.OUTPUT_FILE}", "a+") as output:
