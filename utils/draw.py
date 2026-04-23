@@ -5,7 +5,6 @@ import random
 from .wall import Wall
 from .color import color, bg_color
 from .cursor import get_key, clear, move_cursor_to_bottom
-
 from .cursor import cursor_more_line, cursor
 
 import os
@@ -166,6 +165,15 @@ class Presentation:
         self.info_block.pos = ((14), (1))
         self.startloop()
         while True:
+            key = get_key()
+            self.key_handler(key, True)
+            if key:
+                print(
+                    self.info_block.block(
+                        self.maze.get_theme_name(), self.set_perfect_mode
+                    )
+                )
+                print(self.secondbloc.block(self.set_perfect_mode))
             if maze_save is None:
                 draw_a_maze(
                     self.maze.printable_maze,
@@ -202,15 +210,6 @@ class Presentation:
                     self.print_modifier,
                 )
                 self.maze.draw_in_folders()
-            key = get_key()
-            self.key_handler(key, True)
-            if key:
-                print(
-                    self.info_block.block(
-                        self.maze.get_theme_name(), self.set_perfect_mode
-                    )
-                )
-                print(self.secondbloc.block(self.set_perfect_mode))
 
     def startloop(self) -> None:
         print(
@@ -540,8 +539,17 @@ def draw_a_maze(
             print(color(changed.enter_or_exit(), 50, 200, 50))
         if changed.entre is True:
             print(color(changed.enter_or_exit(), 200, 100, 50))
-    for pos_x, pos_y in path_pos:
-        print(cursor((12 + (pos_y * 3) + 1, 35 + (pos_x * 6) + 2), "██"))
+    for pos_x, pos_y in path_pos[1:-1]:
+        print(bg_color(
+                color(
+                    cursor((12 + (pos_y * 3) + 1, 35 + (pos_x * 6) + 2), "██"),
+                    backcolor[r],
+                    backcolor[g],
+                    backcolor[b],),
+                wallcolor[r]-10,
+                wallcolor[g]-10,
+                wallcolor[b]-10,)
+            )
     move_cursor_to_bottom()
     maze_save = maze
     print(flush=True, end="")
