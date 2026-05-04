@@ -99,8 +99,6 @@ class Solver:
         # la sortie
 
         result = self.tuple_to_dir(path)
-        with open("restult.txt", "w+") as fd:
-            print(result, file=fd)
         return (result, path)  # Retourner le chemin trouvé
 
     def tuple_to_dir(self, path: list[tuple[int, int]]) -> list[str]:

@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Callable, Generator, Any
+from typing import TYPE_CHECKING, Callable, Generator
 from types import GeneratorType
 import re
 import random
@@ -8,7 +8,6 @@ from .cursor import get_key, clear, move_cursor_to_bottom
 from .cursor import cursor_more_line, cursor
 
 import os
-
 
 if TYPE_CHECKING:
     from utils import Player
@@ -161,12 +160,14 @@ class Presentation:
         - Maze solving visualization
         - Redrawing UI elements
         """
+        from maze.solver import Solver
 
         self.info_block.pos = ((14), (1))
         self.startloop()
+        path_draw = True
         while True:
             key = get_key()
-            self.key_handler(key, True)
+            self.key_handler(key, True, path_draw)
             if key:
                 print(
                     self.info_block.block(
@@ -210,6 +211,10 @@ class Presentation:
                     self.print_modifier,
                 )
                 self.maze.draw_in_folders()
+                solve = Solver(self.maze.maze, self.config)
+                self.solve, self.path = solve.solve_maze()
+                with open(f"{self.config.OUTPUT_FILE}", "a+") as output:
+                    print("".join(self.solve), file=output)
 
     def startloop(self) -> None:
         print(
@@ -228,9 +233,8 @@ class Presentation:
         if algo:
             self.generator = algo()
 
-    def key_handler(self, key: str, onloop: bool) -> None:
+    def key_handler(self, key: str, onloop: bool, path_draw: bool) -> None:
         global maze_save
-        from utils.path_display import PathDrawer
         from maze.solver import Solver
 
         if key == "q":
@@ -251,7 +255,6 @@ class Presentation:
             self.path = []
             self.maze.make_a_maze()
             self.generator = self.maze.backtrack()
-
 
         elif key == "i" and onloop:
             self.solve = None
@@ -288,13 +291,15 @@ class Presentation:
             maze_save = None
 
         elif key == "l" and onloop:
-            solve = Solver(self.maze.maze, self.config)
-            self.solve, self.path = solve.solve_maze()
-            with open(f"{self.config.OUTPUT_FILE}", "a+") as output:
-                print("".join(self.solve), file=output)
-            maze_save = None
-            # pathdraw = PathDrawer(self.path)
-            # pathdraw.path_draw(35, 12)
+            if path_draw:
+                solve = Solver(self.maze.maze, self.config)
+                self.solve, self.path = solve.solve_maze()
+                path_draw = False
+                maze_save = None
+            else:
+                self.solve, self.path = ([], [])
+                path_draw = True
+                maze_save = None
 
     def change_theme(self) -> None:
         """
@@ -539,17 +544,21 @@ def draw_a_maze(
             print(color(changed.enter_or_exit(), 50, 200, 50))
         if changed.entre is True:
             print(color(changed.enter_or_exit(), 200, 100, 50))
+
     for pos_x, pos_y in path_pos[1:-1]:
-        print(bg_color(
+        print(
+            bg_color(
                 color(
                     cursor((12 + (pos_y * 3) + 1, 35 + (pos_x * 6) + 2), "██"),
                     backcolor[r],
                     backcolor[g],
-                    backcolor[b],),
-                wallcolor[r]-10,
-                wallcolor[g]-10,
-                wallcolor[b]-10,)
+                    backcolor[b],
+                ),
+                wallcolor[r] - 10,
+                wallcolor[g] - 10,
+                wallcolor[b] - 10,
             )
+        )
     move_cursor_to_bottom()
     maze_save = maze
     print(flush=True, end="")
