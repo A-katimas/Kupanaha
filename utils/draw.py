@@ -255,6 +255,7 @@ class Presentation:
                 self.maze.printable_maze,
                 self.maze.get_tuple_theme()[0],
                 self.maze.get_tuple_theme()[1],
+                self.path,
                 self.print_modifier,
                 path_draw[0],
             )
