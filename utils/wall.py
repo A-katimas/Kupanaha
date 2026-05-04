@@ -54,7 +54,7 @@ class Wall(ABC):
         """
         return cursor_more_line(
             (self.x + 1, self.y + 2),
-            ["██"],
+            ["🦦"],
         )
 
 

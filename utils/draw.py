@@ -533,6 +533,8 @@ def draw_a_maze(
         else maze
     )
 
+    pos_enter: tuple[int, int]
+
     for changed in changed_list:
         wall = changed.wall()
         for func in effect or []:
@@ -552,26 +554,78 @@ def draw_a_maze(
             end="",
         )
         if changed.exit is True:
-            print(color(changed.enter_or_exit(), 50, 200, 50))
+            print(bg_color(changed.enter_or_exit(), wallcolor[r],
+                wallcolor[g],
+                wallcolor[b],))
         if changed.entre is True:
-            print(color(changed.enter_or_exit(), 200, 100, 50))
+            print(bg_color(changed.enter_or_exit(), wallcolor[r],
+                wallcolor[g],
+                wallcolor[b],))
+            pos_enter = changed.pos
     if show_solve:
-        for pos_x, pos_y in path_pos[1:-1]:
+        emoji = [
+            "🐠",
+            "🐡",
+            "🐟",
+            "🍣",
+            "🦈",
+            "🎏"
+        ]
+        
+        i = 1
+        for pos_x, pos_y in path_pos[0:-1]:
+            new_x = (pos_x + path_pos[i][0]) / 2
+            new_y = (pos_y + path_pos[i][1]) / 2
+            if (not (pos_x == 0 and pos_y == 0)):
+                print(
+                    bg_color(
+                        color(
+                            cursor(
+                                (12 + (pos_y * 3) + 1, 35 + (pos_x * 6) + 2), random.choice(emoji)
+                            ),
+                            backcolor[r],
+                            backcolor[g],
+                            backcolor[b],
+                        ),
+                        wallcolor[r],
+                        wallcolor[g],
+                        wallcolor[b],
+                    )
+                )
+
             print(
                 bg_color(
                     color(
                         cursor(
-                            (12 + (pos_y * 3) + 1, 35 + (pos_x * 6) + 2), "██"
+                            (12 + int(new_y * 3) + 1, 35 + int(new_x * 6) + 2), random.choice(emoji)
                         ),
                         backcolor[r],
                         backcolor[g],
                         backcolor[b],
                     ),
-                    wallcolor[r] - 10,
-                    wallcolor[g] - 10,
-                    wallcolor[b] - 10,
+                    wallcolor[r],
+                    wallcolor[g],
+                    wallcolor[b],
                 )
             )
+
+            if (new_x == pos_x):
+                print(
+                    bg_color(
+                        color(
+                            cursor(
+                                (12 + int(new_y * 3) + 2, 35 + int(new_x * 6) + 2), random.choice(emoji)
+                            ),
+                            backcolor[r],
+                            backcolor[g],
+                            backcolor[b],
+                        ),
+                        wallcolor[r],
+                        wallcolor[g],
+                        wallcolor[b],
+                    )
+                )
+            i = i + 1
     move_cursor_to_bottom()
     maze_save = maze
     print(flush=True, end="")
