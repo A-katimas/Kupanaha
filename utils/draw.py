@@ -121,7 +121,7 @@ class Presentation:
             ):
                 break
 
-            self.key_handler(key, False)
+            self.key_handler(key, False, False)
             if not key == "":
                 self.scren_size = os.get_terminal_size()
                 clear()
@@ -164,7 +164,7 @@ class Presentation:
 
         self.info_block.pos = ((14), (1))
         self.startloop()
-        path_draw = True
+        path_draw = [False]
         while True:
             key = get_key()
             self.key_handler(key, True, path_draw)
@@ -182,9 +182,12 @@ class Presentation:
                     self.maze.get_tuple_theme()[1],
                     self.path,
                     self.print_modifier,
+                    path_draw[0],
                 )
+            new_maze: bool = False
             try:
                 if self.generator is not None:
+                    new_maze = True
                     next(self.generator)
                     draw_a_maze(
                         self.maze.printable_maze,
@@ -192,6 +195,7 @@ class Presentation:
                         self.maze.get_tuple_theme()[1],
                         self.path,
                         self.print_modifier,
+                        False,
                     )
             except StopIteration:
                 if (
@@ -209,12 +213,14 @@ class Presentation:
                     self.maze.get_tuple_theme()[1],
                     self.path,
                     self.print_modifier,
+                    path_draw[0],
                 )
                 self.maze.draw_in_folders()
-                solve = Solver(self.maze.maze, self.config)
-                self.solve, self.path = solve.solve_maze()
-                with open(f"{self.config.OUTPUT_FILE}", "a+") as output:
-                    print("".join(self.solve), file=output)
+                if new_maze:
+                    solve = Solver(self.maze.maze, self.config)
+                    self.solve, self.path = solve.solve_maze()
+                    with open(f"{self.config.OUTPUT_FILE}", "a+") as output:
+                        print("".join(self.solve), file=output)
 
     def startloop(self) -> None:
         print(
@@ -233,7 +239,9 @@ class Presentation:
         if algo:
             self.generator = algo()
 
-    def key_handler(self, key: str, onloop: bool, path_draw: bool) -> None:
+    def key_handler(
+        self, key: str, onloop: bool, path_draw: list[bool]
+    ) -> None:
         global maze_save
         from maze.solver import Solver
 
@@ -248,6 +256,7 @@ class Presentation:
                 self.maze.get_tuple_theme()[0],
                 self.maze.get_tuple_theme()[1],
                 self.print_modifier,
+                path_draw[0],
             )
 
         if key == "b" and onloop:
@@ -291,14 +300,15 @@ class Presentation:
             maze_save = None
 
         elif key == "l" and onloop:
-            if path_draw:
-                solve = Solver(self.maze.maze, self.config)
-                self.solve, self.path = solve.solve_maze()
-                path_draw = False
+            print(cursor((0, 50), "IUYREIOUWY"))
+            if not path_draw[0]:
+                # solve = Solver(self.maze.maze, self.config)
+                # self.solve, self.path = solve.solve_maze()
+                path_draw[0] = True
                 maze_save = None
             else:
-                self.solve, self.path = ([], [])
-                path_draw = True
+                # self.solve, self.path = ([], [])
+                path_draw[0] = False
                 maze_save = None
 
     def change_theme(self) -> None:
@@ -496,6 +506,7 @@ def draw_a_maze(
     wallcolor: tuple[int, int, int],
     path_pos: list[tuple[int, int]] = [],
     effect: list[Callable[..., str]] | None = None,
+    show_solve: bool = False,
 ) -> None:
     """
     Render the maze in the terminal with color optimization.
@@ -544,21 +555,23 @@ def draw_a_maze(
             print(color(changed.enter_or_exit(), 50, 200, 50))
         if changed.entre is True:
             print(color(changed.enter_or_exit(), 200, 100, 50))
-
-    for pos_x, pos_y in path_pos[1:-1]:
-        print(
-            bg_color(
-                color(
-                    cursor((12 + (pos_y * 3) + 1, 35 + (pos_x * 6) + 2), "██"),
-                    backcolor[r],
-                    backcolor[g],
-                    backcolor[b],
-                ),
-                wallcolor[r] - 10,
-                wallcolor[g] - 10,
-                wallcolor[b] - 10,
+    if show_solve:
+        for pos_x, pos_y in path_pos[1:-1]:
+            print(
+                bg_color(
+                    color(
+                        cursor(
+                            (12 + (pos_y * 3) + 1, 35 + (pos_x * 6) + 2), "██"
+                        ),
+                        backcolor[r],
+                        backcolor[g],
+                        backcolor[b],
+                    ),
+                    wallcolor[r] - 10,
+                    wallcolor[g] - 10,
+                    wallcolor[b] - 10,
+                )
             )
-        )
     move_cursor_to_bottom()
     maze_save = maze
     print(flush=True, end="")
