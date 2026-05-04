@@ -10,6 +10,7 @@ from maze.maker import THEMES
 
 algodispo = {"prims": 1, "backtrack": 1, "Prims": 1, "BackTrack": 1}
 
+
 def color(text: str | int | None, r: int, g: int, b: int) -> str:
     """
     Apply an RGB foreground color to the given text using ANSI escape codes.
@@ -30,6 +31,7 @@ def color(text: str | int | None, r: int, g: int, b: int) -> str:
     if isinstance(text, str):
         return f"\033[38;2;{r};{g};{b}m{text}\033[0m"
     return f"\033[38;2;{r};{g};{b}m{str(text)}\033[0m"
+
 
 class BaseConfig(BaseModel):
     """
