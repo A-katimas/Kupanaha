@@ -14,9 +14,12 @@ run:
 
 install:
 	@if [ ! -d $(VENV) ]; then \
-		echo "Création de l'environnement..."; \
-		uv sync --extra dev; \
+		@echo "Création de l'environnement..."; \
+		@uv sync --extra dev; \
 	fi
+
+build:
+	@tar -czvf mazetar.tar mazetar/
 
 debug:
 	@uv run python -m pdb $(SRC)
@@ -25,7 +28,9 @@ clean:
 	@find . -type d -name "__pycache__" -exec rm -rf {} +
 	@find . -name "*.pyc" -delete
 	@rm -rf $(VENV)
-	echo "all is clear"
+	@rm -rf uv.lock
+	@rm -rf maze.txt
+	@echo "all is clear"
 
 lint:
 	@uv run $(PYTHON) -m flake8 . --extend-exclude .venv
@@ -36,4 +41,4 @@ lint-strict:
 	@uv run $(PYTHON) -m flake8 . --extend-exclude .venv
 	@uv run $(PYTHON) -m mypy . --strict
 
-.PHONY: run install debug clean lint lint-strict
+.PHONY: run install debug clean lint lint-strict build

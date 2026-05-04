@@ -1,8 +1,6 @@
 # from pydantic import config
 from maze.maker import Direction
-
 from parthing import BaseConfig
-
 from typing import Any
 
 # from utils.wall import Wall

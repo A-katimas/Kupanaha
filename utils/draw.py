@@ -386,7 +386,6 @@ class InfoBlock:
         border_top = "█" + "▀" * w + "█"
         border_bottom = "█" + "▄" * w + "█"
 
-        # ██ ▄▄ ▀▀
         def line(content: str) -> str:
             """
             Format a single line with padding, ignoring ANSI codes length.
@@ -463,7 +462,6 @@ class moveblock:
         else:
             perfectmod = True
 
-        # ██ ▄▄ ▀▀
         def line(content: str) -> str:
             """
             Format a single line with padding, ignoring ANSI escape sequences.
@@ -633,21 +631,6 @@ def draw_a_maze(
     move_cursor_to_bottom()
     maze_save = maze
     print(flush=True, end="")
-
-
-# def debug_key():
-#     import tty, termios, sys
-
-#     fd = sys.stdin.fileno()
-#     old = termios.tcgetattr(fd)
-#     try:
-#         tty.setraw(fd)
-#         key = sys.stdin.read(1)
-#         if key == "\x1b":
-#             key += sys.stdin.read(2)
-#     finally:
-#         termios.tcsetattr(fd, termios.TCSADRAIN, old)
-#     print(f"raw: {repr(key)}")
 
 
 class otter(Wall):
