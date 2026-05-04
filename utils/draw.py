@@ -301,7 +301,6 @@ class Presentation:
             maze_save = None
 
         elif key == "l" and onloop:
-            print(cursor((0, 50), "IUYREIOUWY"))
             if not path_draw[0]:
                 # solve = Solver(self.maze.maze, self.config)
                 # self.solve, self.path = solve.solve_maze()
