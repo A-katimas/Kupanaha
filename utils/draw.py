@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Callable, Generator
+from typing import TYPE_CHECKING, Callable, Generator, Any
 from types import GeneratorType
 import re
 import random
@@ -39,17 +39,16 @@ class Presentation:
         from maze.maker import Maze, THEMES
 
         self.generator: Generator[None, None, None] | None = None
-        self.path = []
-        self.solve = None
+        self.solve: str | None = None
         self.themes = THEMES
         self.scren_size = os.get_terminal_size()
         self.config = config
         self.player = player
         self.info_block = InfoBlock(config, (15, 50))
         self.secondbloc = moveblock((30, 1))
-        self.path: list[str] = []
-        self.start_line = 0
-        self.start_col = 0
+        self.path: Any = []
+        self.start_line: int = 0
+        self.start_col: int = 0
         self.maze = Maze(
             (config.WIDTH, config.HEIGHT),
             config.ENTRY,
@@ -121,7 +120,7 @@ class Presentation:
             ):
                 break
 
-            self.key_handler(key, False, False)
+            self.key_handler(key, False, [False])
             if not key == "":
                 self.scren_size = os.get_terminal_size()
                 clear()
@@ -243,7 +242,6 @@ class Presentation:
         self, key: str, onloop: bool, path_draw: list[bool]
     ) -> None:
         global maze_save
-        from maze.solver import Solver
 
         if key == "q":
             raise ValueError("Good Bey")
@@ -504,7 +502,7 @@ def draw_a_maze(
     maze: list[Wall],
     backcolor: tuple[int, int, int],
     wallcolor: tuple[int, int, int],
-    path_pos: list[tuple[int, int]] = [],
+    path_pos: list[Any] = [],
     effect: list[Callable[..., str]] | None = None,
     show_solve: bool = False,
 ) -> None:
@@ -533,8 +531,6 @@ def draw_a_maze(
         else maze
     )
 
-    pos_enter: tuple[int, int]
-
     for changed in changed_list:
         wall = changed.wall()
         for func in effect or []:
@@ -554,34 +550,37 @@ def draw_a_maze(
             end="",
         )
         if changed.exit is True:
-            print(bg_color(changed.enter_or_exit(), wallcolor[r],
-                wallcolor[g],
-                wallcolor[b],))
+            print(
+                bg_color(
+                    changed.enter_or_exit(),
+                    wallcolor[r],
+                    wallcolor[g],
+                    wallcolor[b],
+                )
+            )
         if changed.entre is True:
-            print(bg_color(changed.enter_or_exit(), wallcolor[r],
-                wallcolor[g],
-                wallcolor[b],))
-            pos_enter = changed.pos
+            print(
+                bg_color(
+                    changed.enter_or_exit(),
+                    wallcolor[r],
+                    wallcolor[g],
+                    wallcolor[b],
+                )
+            )
     if show_solve:
-        emoji = [
-            "🐠",
-            "🐡",
-            "🐟",
-            "🍣",
-            "🦈",
-            "🎏"
-        ]
-        
+        emoji = ["🐠", "🐡", "🐟", "🍣", "🦈", "🎏"]
+
         i = 1
         for pos_x, pos_y in path_pos[0:-1]:
             new_x = (pos_x + path_pos[i][0]) / 2
             new_y = (pos_y + path_pos[i][1]) / 2
-            if (not (pos_x == 0 and pos_y == 0)):
+            if not (pos_x == 0 and pos_y == 0):
                 print(
                     bg_color(
                         color(
                             cursor(
-                                (12 + (pos_y * 3) + 1, 35 + (pos_x * 6) + 2), random.choice(emoji)
+                                (12 + (pos_y * 3) + 1, 35 + (pos_x * 6) + 2),
+                                random.choice(emoji),
                             ),
                             backcolor[r],
                             backcolor[g],
@@ -597,7 +596,8 @@ def draw_a_maze(
                 bg_color(
                     color(
                         cursor(
-                            (12 + int(new_y * 3) + 1, 35 + int(new_x * 6) + 2), random.choice(emoji)
+                            (12 + int(new_y * 3) + 1, 35 + int(new_x * 6) + 2),
+                            random.choice(emoji),
                         ),
                         backcolor[r],
                         backcolor[g],
@@ -609,12 +609,16 @@ def draw_a_maze(
                 )
             )
 
-            if (new_x == pos_x):
+            if new_x == pos_x:
                 print(
                     bg_color(
                         color(
                             cursor(
-                                (12 + int(new_y * 3) + 2, 35 + int(new_x * 6) + 2), random.choice(emoji)
+                                (
+                                    12 + int(new_y * 3) + 2,
+                                    35 + int(new_x * 6) + 2,
+                                ),
+                                random.choice(emoji),
                             ),
                             backcolor[r],
                             backcolor[g],

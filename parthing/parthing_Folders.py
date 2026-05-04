@@ -9,7 +9,6 @@ from utils import color
 from typing import Any
 from maze.maker import THEMES
 
-
 algodispo = {"prims": 1, "backtrack": 1, "Prims": 1, "BackTrack": 1}
 
 

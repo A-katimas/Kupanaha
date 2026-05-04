@@ -28,7 +28,7 @@ class Solver:
         self.maze = maze
         self.config = config
 
-    def solve_maze(self) -> list[str]:
+    def solve_maze(self) -> Any:
 
         queue = [
             self.config.ENTRY
@@ -111,7 +111,7 @@ class Solver:
         Returns:
             A list of direction names corresponding to movements.
         """
-        result = []
+        result: list[str] = []
 
         for i in range(len(path) - 1):
             dx = path[i + 1][0] - path[i][0]
