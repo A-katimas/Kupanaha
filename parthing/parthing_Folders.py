@@ -21,8 +21,8 @@ class BaseConfig(BaseModel):
     options.
     """
 
-    WIDTH: int = Field(..., ge=3)
-    HEIGHT: int = Field(..., ge=3)
+    WIDTH: int = Field(..., ge=3, le=300)
+    HEIGHT: int = Field(..., ge=3, le=170)
     ENTRY: tuple[int, int]
     EXIT: tuple[int, int]
     OUTPUT_FILE: str = Field("dont_fgt_me_maze.txt")
