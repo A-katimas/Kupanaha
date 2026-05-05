@@ -51,7 +51,10 @@ def main() -> None:
         clear()
         random.seed(config.SEED)
 
-        player = Player([config.ENTRY[0], config.ENTRY[1]], "🦦")
+        icones_joueur = {"sakura": "👘", "halloween": "👻", "default": "🦦"}
+        mon_sprite = icones_joueur.get(config.THEME, "🦦")
+
+        player = Player([config.ENTRY[0], config.ENTRY[1]], mon_sprite)
 
         try:
             press = Presentation(config, player)

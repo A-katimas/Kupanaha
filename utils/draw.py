@@ -176,6 +176,7 @@ class Presentation:
                 print(self.secondbloc.block(self.set_perfect_mode))
             if maze_save is None:
                 draw_a_maze(
+                    self,
                     self.maze.printable_maze,
                     self.maze.get_tuple_theme()[0],
                     self.maze.get_tuple_theme()[1],
@@ -189,6 +190,7 @@ class Presentation:
                     new_maze = True
                     next(self.generator)
                     draw_a_maze(
+                        self,
                         self.maze.printable_maze,
                         self.maze.get_tuple_theme()[0],
                         self.maze.get_tuple_theme()[1],
@@ -207,6 +209,7 @@ class Presentation:
                 else:
                     self.generator = None
                 draw_a_maze(
+                    self,
                     self.maze.printable_maze,
                     self.maze.get_tuple_theme()[0],
                     self.maze.get_tuple_theme()[1],
@@ -250,6 +253,7 @@ class Presentation:
             self.change_theme()
             maze_save = None
             draw_a_maze(
+                self,
                 self.maze.printable_maze,
                 self.maze.get_tuple_theme()[0],
                 self.maze.get_tuple_theme()[1],
@@ -497,6 +501,7 @@ class moveblock:
 
 
 def draw_a_maze(
+    press: Any,
     maze: list[Wall],
     backcolor: tuple[int, int, int],
     wallcolor: tuple[int, int, int],
@@ -566,7 +571,54 @@ def draw_a_maze(
                 )
             )
     if show_solve:
-        emoji = ["🐠", "🐡", "🐟", "🍣", "🦈", "🎏"]
+        emoji = {
+            "white": "❄️",
+            "pink": "🌸",
+            "blue": "🐟",
+            "green": "🌿",
+            "red": "🔥",
+            "yellow": "🍌",
+            "purple": "🍇",
+            "orange": "🍊",
+            "cyan": "💎",
+            "dark": "🖤",
+            "cyberpunk": "🎮",
+            "forest": "🌲",
+            "ocean": "🏝️",
+            "lava": "🌋",
+            "gold": "🪙",
+            "ice": "🍦",
+            "midnight": "🌕",
+            "sakura": "🗡️",
+            "matrix": "01",
+            "sunset": "☀️",
+            "neon": "🦋",
+            "blood": "🩸",
+            "toxic": "💀",
+            "sand": "⌛",
+            "ash": "♥️",
+            "copper": "🥉",
+            "arctic": "🌬️",
+            "volcano": "🌋",
+            "jade": "🐉",
+            "rose": "🌹",
+            "steel": "⚙️",
+            "void": "🎃",
+            "ghost": "👻",
+            "rust": "🌶️",
+            "teal": "🦆",
+            "lavender": "🪻",
+            "toxic_green": "☘️",
+            "deep_sea": "🔮",
+            "inferno": "🌪️",
+            "snow": "❄︎",
+            "poison": "☣️",
+            "aurora": "🌅",
+            "crimson": "🚓"
+
+        }
+
+        them = press.maze.get_theme_name()
 
         i = 1
         for pos_x, pos_y in path_pos[0:-1]:
@@ -578,7 +630,7 @@ def draw_a_maze(
                         color(
                             cursor(
                                 (12 + (pos_y * 3) + 1, 35 + (pos_x * 6) + 2),
-                                random.choice(emoji),
+                                emoji[them]
                             ),
                             backcolor[r],
                             backcolor[g],
@@ -595,7 +647,7 @@ def draw_a_maze(
                     color(
                         cursor(
                             (12 + int(new_y * 3) + 1, 35 + int(new_x * 6) + 2),
-                            random.choice(emoji),
+                            emoji[them]
                         ),
                         backcolor[r],
                         backcolor[g],
@@ -616,7 +668,7 @@ def draw_a_maze(
                                     12 + int(new_y * 3) + 2,
                                     35 + int(new_x * 6) + 2,
                                 ),
-                                random.choice(emoji),
+                                emoji[them]
                             ),
                             backcolor[r],
                             backcolor[g],
