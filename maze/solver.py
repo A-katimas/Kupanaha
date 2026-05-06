@@ -24,11 +24,45 @@ from typing import Any
 
 
 class Solver:
+    """
+    Solves a maze using the Breadth-First Search (BFS) algorithm.
+
+    The solver explores the maze level by level, starting from the entry point.
+    It keeps track of visited cells to avoid infinite loops, and records the
+    parent of each visited cell in order to reconstruct the solution path once
+    the exit is reached.
+
+    Attributes:
+        maze (list): A 2D grid where each cell contains a binary value
+                     representing which walls are open or closed.
+        config (BaseConfig): Configuration object containing the maze entry
+                             point, exit point, and other settings.
+
+    Methods:
+        solve_maze(): Runs the BFS algorithm and returns the solution path
+                      as a tuple (list of directions, list of coordinates),
+                      or an empty list if no path exists.
+    """
     def __init__(self, maze: list[Any], config: BaseConfig):
         self.maze = maze
         self.config = config
 
     def solve_maze(self) -> Any:
+        """
+        Explores the maze using BFS and reconstructs the solution path.
+
+        Starting from the entry point, the algorithm explores all reachable cells
+        level by level. For each cell, it checks the four possible directions and
+        moves to a neighbor only if there is no wall blocking the way. Once the
+        exit is reached, it reconstructs the path by backtracking through the
+        came_from dictionary, then reverses it to get the correct order.
+
+        Returns:
+            tuple: A tuple (directions, path) where:
+                - directions is a list of Direction values from entry to exit.
+                - path is a list of (x, y) coordinates from entry to exit.
+            list: An empty list if no path exists between entry and exit.
+        """
 
         queue = [
             self.config.ENTRY

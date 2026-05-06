@@ -510,15 +510,31 @@ def draw_a_maze(
     show_solve: bool = False,
 ) -> None:
     """
-    Render the maze in the terminal with color optimization.
+    Renders the maze in the terminal and optionally displays the solution path.
 
-    Only updates tiles that have changed compared to the previous frame,
-    improving performance and reducing flickering.
+    Only redraws cells that have changed since the last frame, which improves
+    performance and reduces flickering. If show_solve is True, overlays an
+    emoji along the solution path, chosen based on the current maze theme.
 
     Args:
-        maze: List of Wall objects representing the maze.
-        backcolor: RGB tuple for background color.
-        wallcolor: RGB tuple for wall color.
+        press (Any): The main application object, used to retrieve the
+                     current maze theme name.
+        maze (list[Wall]): List of Wall objects representing the current
+                           state of the maze.
+        backcolor (tuple[int, int, int]): RGB color used for the background
+                                          of each cell.
+        wallcolor (tuple[int, int, int]): RGB color used for the walls
+                                          of each cell.
+        path_pos (list): List of (x, y) coordinate tuples representing
+                         the solution path. Defaults to an empty list.
+        effect (list[Callable] | None): Optional list of functions applied
+                                        to each wall string before rendering.
+                                        Defaults to None.
+        show_solve (bool): If True, draws the solution path using a
+                           theme-specific emoji. Defaults to False.
+
+    Returns:
+        None
     """
     global maze_save
     r = 0

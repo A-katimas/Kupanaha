@@ -135,6 +135,9 @@ class Direction(Enum):
         }[self]
 
     def to_char(self) -> str:
+        """
+        Return the direction as string.
+        """
         return {
             Direction.DIR_N: "N",
             Direction.DIR_E: "E",
