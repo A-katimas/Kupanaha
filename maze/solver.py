@@ -51,10 +51,11 @@ class Solver:
         """
         Explores the maze using BFS and reconstructs the solution path.
 
-        Starting from the entry point, the algorithm explores all reachable cells
-        level by level. For each cell, it checks the four possible directions and
-        moves to a neighbor only if there is no wall blocking the way. Once the
-        exit is reached, it reconstructs the path by backtracking through the
+        Starting from the entry point, the algorithm explores all
+        reachable cells level by level. For each cell, it checks
+        the four possible directions and moves to a neighbor only if
+        there is no wall blocking the way. Once the exit is reached,
+        it reconstructs the path by backtracking through the
         came_from dictionary, then reverses it to get the correct order.
 
         Returns:
