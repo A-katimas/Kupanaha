@@ -1,9 +1,6 @@
-# import utils.wall as wall
 import random
 from enum import Enum
 from typing import Any, Generator
-
-# from typing import Callable
 
 THEMES = {
     "white": [[245, 245, 245], [80, 80, 80]],
@@ -58,10 +55,6 @@ def add_pos(pos1: tuple[int, int], pos2: tuple[int, int]) -> tuple[int, int]:
     """
     Add two 2D positions component-wise.
 
-    Args:
-        pos1 (tuple[int, int]): First position (x, y).
-        pos2 (tuple[int, int]): Second position (x, y).
-
     Returns:
         tuple[int, int]: The element-wise sum of the two positions.
     """
@@ -71,10 +64,6 @@ def add_pos(pos1: tuple[int, int], pos2: tuple[int, int]) -> tuple[int, int]:
 def abs_dist(pos1: tuple[int, int], pos2: tuple[int, int]) -> int:
     """
     Compute the Manhattan distance between two 2D positions.
-
-    Args:
-        pos1 (tuple[int, int]): First position (x, y).
-        pos2 (tuple[int, int]): Second position (x, y).
 
     Returns:
         int: The Manhattan distance between the two positions.

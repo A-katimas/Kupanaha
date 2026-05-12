@@ -225,6 +225,22 @@ class Presentation:
                         print("".join(self.solve), file=output)
 
     def startloop(self) -> None:
+        """
+        Initialize the main rendering loop and start the selected
+        maze generation algorithm.
+
+        This method:
+        - Displays the information and control panels
+        - Selects the maze generation algorithm from the configuration
+        - Creates the corresponding generator used during rendering
+
+        Supported algorithms:
+        - ``prims`` / ``Prims``
+        - ``backtrack`` / ``BackTrack``
+
+        The selected algorithm is stored as a generator in
+        ``self.generator`` and executed progressively in the main loop.
+        """
         print(
             self.info_block.block(
                 self.maze.get_theme_name(), self.set_perfect_mode
@@ -244,6 +260,22 @@ class Presentation:
     def key_handler(
         self, key: str, onloop: bool, path_draw: list[bool]
     ) -> None:
+        """
+        Handle keyboard inputs and trigger the associated maze actions.
+
+        This method processes user key presses to control the application
+        behavior, including:
+        - quitting the program
+        - changing the maze theme
+        - generating mazes with different algorithms
+        - toggling perfect mode
+        - enabling/disabling visual effects
+        - showing or hiding the solver path
+
+        Raises:
+            ValueError:
+                Raised when the user presses ``q`` to quit the program.
+        """
         global maze_save
 
         if key == "q":
@@ -304,12 +336,9 @@ class Presentation:
 
         elif key == "l" and onloop:
             if not path_draw[0]:
-                # solve = Solver(self.maze.maze, self.config)
-                # self.solve, self.path = solve.solve_maze()
                 path_draw[0] = True
                 maze_save = None
             else:
-                # self.solve, self.path = ([], [])
                 path_draw[0] = False
                 maze_save = None
 
@@ -325,12 +354,6 @@ class Presentation:
             if e == self.maze.get_theme_name():
                 flag = True
         self.maze.change_theme(list(self.themes.keys())[0])
-
-    def pressentation_enter(self) -> None:
-        """
-        Placeholder for future feature related to enter key handling.
-        """
-        pass
 
 
 def inverse(wall: str) -> str:
