@@ -630,8 +630,7 @@ def draw_a_maze(
             "snow": "❄︎",
             "poison": "☣️",
             "aurora": "🌅",
-            "crimson": "🚓"
-
+            "crimson": "🚓",
         }
 
         them = press.maze.get_theme_name()
@@ -646,7 +645,7 @@ def draw_a_maze(
                         color(
                             cursor(
                                 (12 + (pos_y * 3) + 1, 35 + (pos_x * 6) + 2),
-                                emoji[them]
+                                emoji[them],
                             ),
                             backcolor[r],
                             backcolor[g],
@@ -663,7 +662,7 @@ def draw_a_maze(
                     color(
                         cursor(
                             (12 + int(new_y * 3) + 1, 35 + int(new_x * 6) + 2),
-                            emoji[them]
+                            emoji[them],
                         ),
                         backcolor[r],
                         backcolor[g],
@@ -684,7 +683,7 @@ def draw_a_maze(
                                     12 + int(new_y * 3) + 2,
                                     35 + int(new_x * 6) + 2,
                                 ),
-                                emoji[them]
+                                emoji[them],
                             ),
                             backcolor[r],
                             backcolor[g],
